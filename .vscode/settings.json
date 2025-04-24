@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./interfaces"
+    ],
+    "black-py.useIntegratedTerminal": true
+}

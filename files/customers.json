@@ -1,0 +1,38 @@
+[
+    {
+        "id": 1,
+        "dni": "0926565652",
+        "first_name": "CASTRO PAREDES",
+        "last_name": "CARLOS",
+        "customer_type": 1,
+        "discount": 0.0,
+        "credit_limit": 10000
+    },
+    {
+        "id": 3,
+        "dni": "092656565215",
+        "first_name": "MONTERO",
+        "last_name": "ANTONIO",
+        "customer_type": 2,
+        "discount": 0.0,
+        "credit_limit": 10000
+    },
+    {
+        "id": 4,
+        "dni": "06256565",
+        "first_name": "MONTERO",
+        "last_name": "CARLOS",
+        "customer_type": 2,
+        "discount": 0.0,
+        "credit_limit": 10000
+    },
+    {
+        "id": 5,
+        "dni": "06565625255",
+        "first_name": "GUEVARA",
+        "last_name": "JOSE",
+        "customer_type": 2,
+        "discount": 0.0,
+        "credit_limit": 10000
+    }
+]

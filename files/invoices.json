@@ -1,0 +1,33 @@
+[
+    {
+        "id": 1,
+        "Fecha": "2025-04-23",
+        "dni": "0926565652",
+        "fullName": "CASTRO PAREDES CARLOS",
+        "pay": "Tarjeta",
+        "subtotal": 76.23,
+        "descuento": 7.623000000000001,
+        "iva": 8.23,
+        "total": 76.84,
+        "detail": [
+            {
+                "id": 1,
+                "product_name": "AVENA POR LIBRA",
+                "sale_price": 0.36,
+                "quantity": 2
+            },
+            {
+                "id": 2,
+                "product_name": "LENTEJA POR LIBRA",
+                "sale_price": 0.96,
+                "quantity": 36
+            },
+            {
+                "id": 5,
+                "product_name": "COCA COLA 500ML",
+                "sale_price": 0.65,
+                "quantity": 63
+            }
+        ]
+    }
+]

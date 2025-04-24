@@ -1,0 +1,5 @@
+instale las sigientes librerias 
+
+pip install prettytable
+pip install pyflakes
+pip install pylint
