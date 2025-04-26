@@ -7,13 +7,13 @@ from colorama import Fore, Style
 from components.header import Header_print
 from models import customer
 from services.Customers.CustomerDTO import CustomerDTO
-from models.company import Company
+from models.company import CompanyModel
 from helpers.jsonManager import JsonFile
 from helpers.utilities import clear_screen, get_last_color, gotoxy, set_color
 from interfaces.iCrud  import ICrud
 from helpers.components import Valida
 from env import  ROOT_PATH 
-from models.customer import  GenericCustomer
+from models.customer import  CustomerModel
 
 class CrudCustomer(ICrud):
 
@@ -90,7 +90,7 @@ class CrudCustomer(ICrud):
                     break
                 else:
                    continue
-            newCustomer = GenericCustomer(
+            newCustomer = CustomerModel(
                 dni=dni, first_name= first_name, 
                 last_name= last_name, customer_type = customer_type, id = 2)
             
@@ -126,7 +126,7 @@ class CrudCustomer(ICrud):
         # print header
         start_x, start_y  = Header_print("Actualización del Cliente")
         # Buscar cliente
-        client:GenericCustomer | None = self.Select_customer(start_x, start_y)
+        client:CustomerModel | None = self.Select_customer(start_x, start_y)
        
         if not client: 
             return
@@ -200,7 +200,7 @@ class CrudCustomer(ICrud):
         
         time.sleep(2)
 
-    def Select_customer(self, x:int, y:int)-> GenericCustomer | None:
+    def Select_customer(self, x:int, y:int)-> CustomerModel | None:
           customer = None
           while not customer:
             set_color(Fore.LIGHTMAGENTA_EX)
@@ -247,10 +247,10 @@ class CrudCustomer(ICrud):
              results =  self.json_file.read()
        
         # convertir OBJETO
-        customers: List[GenericCustomer] = []
+        customers: List[CustomerModel] = []
 
         for client_data in results:
-            customer = GenericCustomer(
+            customer = CustomerModel(
                 id = client_data.get('id', 1),
                 dni=client_data.get('dni', ''),
                 first_name=client_data.get('first_name', ''),
@@ -326,7 +326,7 @@ class CrudCustomer(ICrud):
         # Posición para mensajes debajo de la tabla
         return (x, y + len(lines))
 
-    def __show_list(self, clients: list, x: int, y: int, title: str = "") -> GenericCustomer | None:
+    def __show_list(self, clients: list, x: int, y: int, title: str = "") -> CustomerModel | None:
         """
         Muestra lista de clientes en tabla y permite selección
         
@@ -362,7 +362,7 @@ class CrudCustomer(ICrud):
         self.__show_error("ID no válido", x, y + 3)
         return None
 
-    def __show_one_customer(self,x,y,client:GenericCustomer, title:str)-> Tuple[int, int]:
+    def __show_one_customer(self,x,y,client:CustomerModel, title:str)-> Tuple[int, int]:
          # limpiar y mostrar el cliente
         gotoxy(x, y+1)
         print("\033[0J", end="")

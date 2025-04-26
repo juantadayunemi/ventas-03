@@ -5,8 +5,8 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from colorama import Fore, Style
 from components.header import Header_print
 from services.Products.ProductDTO import ProductDTO
-from models.company import Company
-from models.product import Product
+from models.company import CompanyModel
+from models.product import ProductModel
 from helpers.jsonManager import JsonFile
 from helpers.utilities import clear_screen, get_last_color, gotoxy, set_color
 from interfaces.iCrud  import ICrud
@@ -44,7 +44,7 @@ class CrudProduct(ICrud):
             stock = self.validar.solo_numeros("Err: que sea numérico",50,9)
 
           
-            new_product = Product(product_name=product_name, sale_price=sale_price, stock= int(stock))
+            new_product = ProductModel(product_name=product_name, sale_price=sale_price, stock= int(stock))
             
             productDTO = ProductDTO(new_product)
             products = self.json_file.read()
@@ -136,7 +136,7 @@ class CrudProduct(ICrud):
             set_color(current_style)
         time.sleep(2)
 
-    def Select_product(self, x:int, y:int)-> Product | None:
+    def Select_product(self, x:int, y:int)-> ProductModel | None:
           product = None
           while not product:
             set_color(Fore.LIGHTMAGENTA_EX)
@@ -168,7 +168,7 @@ class CrudProduct(ICrud):
           
           return product[0] if  product else None
     
-    def _find_product(self,search_term:str) -> List[Product] | None:
+    def _find_product(self,search_term:str) -> List[ProductModel] | None:
         """Busca un producto según el criterio de búsqueda"""
         dict_data: list[dict[str, Any]] = []
 
@@ -184,9 +184,9 @@ class CrudProduct(ICrud):
         else:
              dict_data =    self.json_file.read()
 
-        products : list[Product] = []
+        products : list[ProductModel] = []
         for item in dict_data:
-            product = Product(
+            product = ProductModel(
                   product_name =item['product_name'],
                   description = item['description'],
                   purchase_price = item['purchase_price'],
@@ -206,7 +206,7 @@ class CrudProduct(ICrud):
         time.sleep(2)
    
    
-    def __generate_product_table(self, products:list[Product], title: str = "") -> str:
+    def __generate_product_table(self, products:list[ProductModel], title: str = "") -> str:
         """
         Genera una tabla formateada de clientes en formato PrettyTable
         
@@ -263,7 +263,7 @@ class CrudProduct(ICrud):
         # Posición para mensajes debajo de la tabla
         return (x, y + len(lines))
 
-    def __show_list(self, products: list[Product], x: int, y: int, title: str = "") ->Product | None:
+    def __show_list(self, products: list[ProductModel], x: int, y: int, title: str = "") ->ProductModel | None:
         """
         Muestra lista de clientes en tabla y permite selección
         
@@ -299,7 +299,7 @@ class CrudProduct(ICrud):
         self.__show_error("ID no válido", x, y + 3)
         return None
 
-    def __show_one_product(self,x,y,product:Product, title:str)-> Tuple[int, int]:
+    def __show_one_product(self,x,y,product:ProductModel, title:str)-> Tuple[int, int]:
          # limpiar y mostrar el cliente
         gotoxy(x, y+1)
         print("\033[0J", end="")
@@ -358,7 +358,7 @@ class CrudProduct(ICrud):
 
         start_x, start_y = Header_print("LISTADO DE PRODUCTOS")
 
-        products:List[Product] | None = self._find_product("")
+        products:List[ProductModel] | None = self._find_product("")
  
         if not products  or len(products) == 0 : 
             gotoxy(5,start_y+ 1); print(Fore.RED+ "No hay datos para mostrar..")

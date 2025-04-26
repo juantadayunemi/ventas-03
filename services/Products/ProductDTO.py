@@ -1,19 +1,19 @@
 from typing import Any, Dict
-from models.product import Product
+from models.product import ProductModel
 
 
 class ProductDTO():
 
-    def __init__( self, product:Product):
+    def __init__( self, product:ProductModel):
    
-        self.__product:Product = product
+        self.__product:ProductModel = product
 
     @property
     def id (self)-> int:
         return self.__product.id
     
     @property
-    def product (self)-> Product:
+    def product (self)-> ProductModel:
         return self.__product
 
 

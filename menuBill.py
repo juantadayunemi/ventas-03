@@ -1,23 +1,47 @@
+from datetime import date
 from colorama import Fore, Style
 from helpers.components import Menu
+
+from models.invoice import InvoiceModel
+from services.CredtidoService.creditoService import CrudVentaCredito
 from services.Products.ProductService import CrudProduct
 from services.Sales.SalesService import CrudSales
 from services.Customers.CustomersService import CrudCustomer
 from helpers.utilities import clear_screen, set_color
 import time
-
-# from services.Purchase.PurchaseService import CrudPurchase
-# from services.Supplier.supplierService import CrudSupplier
+from dto.databaseManager  import db
 
 #Menu Proceso Principal
 opc:str = ''
 
 if __name__ == "__main__":
+    print('')
+    db = db()
+ 
+    # Create new invoice with details
+    invoice = InvoiceModel(
+        dni="0926565652",
+        full_name="Juan Perez",
+        payment_method="Tarjeta"
+    )
+
+    # Add details (IDs will be auto-assigned)
+    invoice.details_collection.add("Product 1", 10.99, 2)
+    invoice.details_collection.add("Product 2", 5.50, 3)
+
+    # Save invoice (will auto-assign invoice ID and detail IDs)
+    saved_invoice = db.Invoice.add(invoice)
+
+
+    invoice.details_collection.remove(1)  # Elimina por ID.add()
+
+    print(invoice)
+
     _exit = "               <- Saliendo..."
     while opc !='4':  
         clear_screen()      
-        menu_main = Menu("SISTEMA DE FACTURACION",["1) Clientes","2) Productos","3) Ventas","4) Salir"],20,2)
-        # menu_main = Menu("SISTEMA DE FACTURACION",["1) Clientes","2) Productos","3) Ventas","4) Proveedores", "5) Compras", "6) Salir"],20,2)
+        # menu_main = Menu("SISTEMA DE FACTURACION",["1) Clientes","2) Productos","3) Ventas","4) Salir"],20,2)
+        menu_main = Menu("SISTEMA DE FACTURACION",["1) Clientes","2) Productos","3) Ventas","4) Proveedores", "5) credito", "6) Salir"],20,2)
         # cambio de color de letra y bold
         set_color(Fore.LIGHTBLUE_EX + Style.BRIGHT)
 
@@ -127,11 +151,12 @@ if __name__ == "__main__":
             opc3 =''
             while opc3 !='5':
                 clear_screen()
-                suppCrud = CrudSales() # CrudPurchase()
+                suppCrud = CrudVentaCredito() 
                 set_color(Fore.BLUE + Style.BRIGHT)
-                menu_sales = Menu("Menu Compras",["1) Registrar compra","2) Actualizar","3) Eliminar","4) Consultar","5) Salir"],20,2)
+                menu_sales = Menu("Menu ventas",["1) Registrar cobros","2) Actualizar","3) Eliminar","4) Consultar","5) Salir"],20,2)
                 opc3 = menu_sales.printMenu()
                 if opc3 == "1":  # registro de  venta
+          
                     suppCrud.create()
                     
                 elif opc3 == "2": # actualizar

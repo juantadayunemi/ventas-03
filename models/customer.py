@@ -1,23 +1,33 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional, Union
 
+from models.base import BaseModel
 
-class Client(ABC):
+
+class ClientModel(ABC):
 
     def __init__(self,
                 first_name:str = "Consumidor",
                 last_name:str = "Final",
                 dni:str = "9999999999999",
-                type:Optional[int]=1,
-                id:int = 1):
-        
-        # Método constructor para inicializar los atributos de la clase Cliente
-        self.first_name:str = first_name
-        self.last_name:str = last_name
+                id:Optional[int] = None,
+                customer_type:Optional[int]=1,
+                ):
+
+        self.__id:int = -1 if not id else  id
         self.__dni:str = dni 
-        self.__id:int = id
-        self.__type:int = type  # type: ignore 
-                    
+        self.__first_name:str = first_name
+        self.__last_name:str = last_name
+        self.__customer_type:int = customer_type if isinstance(customer_type, int) else  -1
+
+    @property
+    def id(self) -> int:
+        return self.__id
+    
+    @id.setter
+    def id(self, value:int ) ->None:
+        self.__id = value
+
     @property
     def dni(self) -> str:
         return self.__dni
@@ -30,29 +40,35 @@ class Client(ABC):
             self.__dni = value
         else:
             self.__dni ="9999999999999"  
-  
-
-    def __str__(self) -> str:
-        # Método especial para representar la clase Cliente como una cadena
-        return f'Cliente: {self.__dni} | {self.fullName}'  
     
+    @property
+    def first_name(self)->str:
+        return self.__first_name
+
+    @first_name.setter
+    def first_name(self, values) ->None:
+        self.__first_name = values
+
+    @property
+    def last_name(self)->str:
+        return self.__last_name
+
+    @last_name.setter
+    def last_name(self, values) ->None:
+        self.__last_name = values
+
+    @property
+    def customer_type(self) -> int:
+        return self.__customer_type
+    
+    @customer_type.setter
+    def customer_type(self, value) -> None:
+        self.__customer_type = value
+
     @property
     def fullName(self)-> str:
-        return self.first_name + ' ' + self.last_name
-    
-    @property
-    def type(self) -> int:
-        return self.__type
-    
-    @property
-    def id(self) -> int:
-        return self.__id
-    
-    @id.setter
-    def id(self, value:int ) ->None:
-        self.__id = value
+        return self.__first_name + ' ' + self.__last_name
 
-     
     @property  
     @abstractmethod
     def discount(self) -> float:
@@ -63,101 +79,67 @@ class Client(ABC):
     def credit_limit(self) -> int:
         pass
 
-    def show(self) -> None:
-        # Método para imprimir los detalles del cliente en la consola
-        print('   Nombres    Dni')
-        print(f'{self.fullName}  {self.dni}')    
 
-
-
-
-
-class RegularClient(Client):
+class RegularClient(ClientModel):
     def __init__(self,
                 first_name:str="Consumidor",
                 last_name:str="Final",
                 dni:str="9999999999",
+                id:Optional[int] = None,
                 card=False):
         
         self.__card = card
-        super().__init__(first_name, last_name, dni)  
+        super().__init__(first_name, last_name, dni=dni, id=id)  
             
-    def __str__(self):
-        # Método especial para representar la clase RetailClient como una cadena
-        return f'Client: {self.fullName} Descuento:{self.discount * 100} %'
-      
-    def show(self)->None:
-        # Método para imprimir los detalles del cliente minorista en la consola
-        print(f'Cliente Minorista: DNI:{self.dni} Nombre:{self.first_name} {self.last_name} Descuento:{self.discount*100}%')     
 
-    def getJson(self) -> Dict[str, Any]:
-        # Método para imprimir los detalles del cliente minorista en la consola
-        return {"dni":self.dni,"nombre":self.first_name,"apellido":self.last_name,"valor": self.discount}
-    
     @property
     def credit_limit(self) -> int:
         return 0
     
-     
-    def set_card(self, value : bool) -> None:
-        self.__card = value
-
     @property
     def discount(self) -> float:
         """10 % de descuento si tiene tarjeta."""
         return 0.1 if self.__card else 0
-    
+     
+    def set_card(self, value : bool) -> None:
+        self.__card = value
 
 
-class VipClient(Client):
+
+class VipClient(ClientModel):
     def __init__(self, 
                 first_name:str="Consumidor",
                 last_name:str="Final",
-                dni:str="9999999999"):
+                dni:str="9999999999",
+                id:Optional[int] = None):
         
         # Método constructor para inicializar los atributos de la clase VipClient
-        super().__init__(first_name, last_name, dni)  
-        self.__limit:int = 10000  # Límite de crédito del cliente VIP
+        self.__credit_limit:int = 10000  # Límite de crédito del cliente VIP
+        super().__init__(first_name, last_name, dni=dni, id=id)  
               
     @property
-    def limit(self)-> int:
-        return self.__limit
-    
-    @property
     def credit_limit(self)-> int:
-        return self.__limit
+        return self.__credit_limit
+    
+    @credit_limit.setter
+    def credit_limit(self, value)-> None:
+        self.__credit_limit = value
     
     @property
     def discount(self)-> float:
         return 0
-    
-    
-    @limit.setter
-    def limit(self, value)-> None:
-        self.__limit = 10000 if (value < 10000 or value > 20000) else value 
-  
-    def __str__(self) -> str:
-        # Método especial para representar la clase VipClient como una cadena
-        return f'Cliente: {self.fullName} Cupo: {self.limit}'
-            
-    def show(self)-> None:
-        # Método para imprimir los detalles del cliente VIP en la consola
-        print(f'Cliente Vip: DNI:{self.dni} Nombre: {self.first_name} {self.last_name} Cupo: {self.limit}')     
-        
-    def getJson(self) ->dict[str, Any]:
-        # Método para imprimir los detalles del cliente VIP en la consola
-        return {"dni":self.dni,"nombre":self.first_name,"apellido":self.last_name,"valor": self.limit}
 
+class CustomerModel(ClientModel, BaseModel):
 
-class GenericCustomer(Client):
+    def __init__(self, dni: str, first_name: str, last_name: str, id: Optional[int] = None, 
+               customer_type:Optional[int] = None, discount: Optional[float] = None,  credit_limit: Optional[int] = None) -> None:
 
-    def __init__(self, dni: str, first_name: str, last_name: str, customer_type: int, id:int = 1) -> None:
-        self.__dni:str = dni
-        self.first_name:str = first_name 
-        self.last_name:str = last_name
-        self.__type:int = customer_type  
-
-        self.__instance:Union[RegularClient, VipClient, None] = None
+   
+        self.__discount =  discount if discount else 0
+        self.__customer_type =  customer_type if  customer_type else 1
+        self.__credit_limit =  credit_limit if  credit_limit else 0
+        self.instance:Union[RegularClient, VipClient, None] = None
+        super().__init__(first_name, last_name, dni=dni, id=id)  
 
         # Validation data
         if not isinstance(customer_type, int) or customer_type not in (1, 2):
@@ -172,27 +154,8 @@ class GenericCustomer(Client):
         if not isinstance(last_name, str) or len( last_name) == 0:
             raise ValueError('NOMBRE debe ser de tipo texto y no vacío')
         
-        super().__init__(dni= dni, first_name= first_name, last_name=last_name, type = customer_type, id= id)
+        super().__init__(dni= dni, first_name= first_name, last_name=last_name, customer_type = customer_type, id= id)
 
-    @property
-    def id (self)-> int:
-        return super().id
-    
-    @id.setter
-    def id (self, value)-> None:
-        super().id =  value
-
-
-
-    
-    @property
-    def dni (self)-> str:
-        return self.__dni
-    
-    @dni.setter
-    def dni(self, value:str)-> None:
-        super().dni = value
-        self.__dni = value
 
     def __customer_instance(self) -> Union[RegularClient, VipClient]:
         """Crea la instancia del cliente una sola vez al inicializar."""
@@ -214,6 +177,7 @@ class GenericCustomer(Client):
         )
         return  self.__instance
     
+
     @property
     def customer_type (self)-> int:
         return self.__type
@@ -235,9 +199,33 @@ class GenericCustomer(Client):
         """Devuelve el límite de crédito del cliente."""
         customer_instance = self.__customer_instance()
         if isinstance(customer_instance, VipClient):
-            return customer_instance.limit
+            return customer_instance.__credit_limit
         return 0
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            'id': self.__id,
+            'dni': self.__dni,
+            'first_name': self.__first_name,
+            'last_name': self.__last_name,
+            'customer_type': self.__customer_type,
+            'discount': self.discount,
+            'credit_limit': self.credit_limit,
+        }
+
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]):
+        """Entrada de diccionario y lo convierte en un objeto que representa este modelo"""
+        return cls(
+            id=data.get('id', -1),
+            dni=data.get('dni', ''),
+            first_name=data.get('first_name', ''),
+            last_name=data.get('last_name', ''),
+            customer_type=data.get('customer_type', 1),
+            discount=data.get('discount', 0),
+            credit_limit=data.get('credit_limit', 0),
+        )
 
     def set_card(self, card: bool)-> None:
         customer_instance = self.__customer_instance()

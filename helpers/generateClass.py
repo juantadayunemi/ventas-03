@@ -77,14 +77,13 @@ def generate_class(class_name: str, attributes: Dict[str, str]) -> str:
 
 if __name__ == "__main__":
     supplier_attrs =  {
-        'id':'int = 0',
-        'subtotal': 'float = 0',
-        'iva': 'float = 0',
-        'total': 'float = 0',
-        'detail': '[]',
+        'id': 'int = 1',
+        'fecha_pago':'date',
+        'creditoVenta_id': 'int = 0',
+        'valor': 'float = 0'
     }
 
     print('\33c')
-    print(generate_class("Sales", supplier_attrs))
+    print(generate_class("PagoCredito", supplier_attrs))
 
     print()

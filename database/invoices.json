@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "date": "2025-04-25",
+    "dni": "0926565652",
+    "full_name": "Juan Perez",
+    "payment_method": "Tarjeta",
+    "subtotal": 38.480000000000004,
+    "discount": 0,
+    "tax": 0,
+    "total": 38.480000000000004,
+    "details": [
+      {
+        "id": 1,
+        "product_name": "Product 1",
+        "sale_price": 10.99,
+        "quantity": 2,
+        "subtotal": 21.98
+      },
+      {
+        "id": 2,
+        "product_name": "Product 2",
+        "sale_price": 5.5,
+        "quantity": 3,
+        "subtotal": 16.5
+      }
+    ]
+  }
+]

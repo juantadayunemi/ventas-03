@@ -14,17 +14,7 @@ class JsonFile(iJson):
             json.dump(data if isinstance(data, list) else [data], file, indent=4)
 
     def update(self, new_data):
-        """
-        Actualiza uno o varios registros en el archivo JSON.
-        
-        Args:
-            new_data (dict|list): Puede ser:
-                - Un diccionario con los datos actualizados (debe contener 'id')
-                - Una lista de diccionarios para múltiples actualizaciones
-        
-        Returns:
-            bool: True si se realizó al menos una actualización, False en caso contrario
-        """
+
         try:
             # Leer datos existentes
             current_data = self.read()

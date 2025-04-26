@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "num_factura": "26502",
+    "total_credito": 23.36,
+    "saldo_credito": 23.06,
+    "estado": "Pendiente",
+    "pagos": []
+  },
+  {
+    "id": 2,
+    "num_factura": "333633",
+    "total_credito": 300.25,
+    "saldo_credito": 300.25,
+    "estado": "Pendiente",
+    "pagos": []
+  },
+  {
+    "id": 3,
+    "num_factura": "333633",
+    "total_credito": 300.25,
+    "saldo_credito": 300.25,
+    "estado": "Pendiente",
+    "pagos": []
+  }
+]

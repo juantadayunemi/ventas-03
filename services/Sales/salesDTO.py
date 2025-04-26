@@ -1,15 +1,15 @@
 from typing import Any, Dict, List
 from services.Sales.calculos import Icalculo
 from datetime import date
-from models.customer import  GenericCustomer
-from models.product import Product
+from models.customer import  CustomerModel
+from models.product import ProductModel
 
 class SaleDetail:
     _line=0
-    def __init__(self,product:Product, quantity:float = 0):
+    def __init__(self,product:ProductModel, quantity:float = 0):
         SaleDetail._line += 1
         self.__id:int = SaleDetail._line
-        self.product: Product = product
+        self.product: ProductModel = product
         self.sale_price:float = product.sale_price
         self.quantity:float = quantity
     
@@ -26,11 +26,11 @@ class Sale(Icalculo):
     next:int = 0
     FACTOR_IVA:float = 0.12
 
-    def __init__(self,client :GenericCustomer):
+    def __init__(self,client :CustomerModel):
         Sale.next += 1
         self.__invoice:int = Sale.next
         self.date = date.today()
-        self.customer:GenericCustomer = client
+        self.customer:CustomerModel = client
         self.subtotal:float = 0
         self.percentage_discount:float = client.discount 
         self.discount : float = 0
@@ -53,7 +53,7 @@ class Sale(Icalculo):
     def cal_discount(self,valor:float=0,discount:float=0)->float:
         return valor * discount
     
-    def add_detail(self,prod:Product, qty:float)->None:
+    def add_detail(self,prod:ProductModel, qty:float)->None:
         # composicion entre detventa y venta
         detail = SaleDetail(prod,qty)
         self.subtotal += round(detail.sale_price* detail.quantity,2)

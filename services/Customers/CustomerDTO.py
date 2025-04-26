@@ -1,11 +1,11 @@
 from typing import Any, Dict
-from models.customer import GenericCustomer
+from models.customer import CustomerModel
 
 
 class CustomerDTO():
-    def __init__( self, customer:GenericCustomer):
+    def __init__( self, customer:CustomerModel):
 
-        self.__customer_generic:GenericCustomer = customer
+        self.__customer_generic:CustomerModel = customer
 
 
     @property
@@ -13,7 +13,7 @@ class CustomerDTO():
         return self.__customer_generic.id
     
     @property
-    def customer (self)-> GenericCustomer:
+    def customer (self)-> CustomerModel:
         return self.__customer_generic
 
 

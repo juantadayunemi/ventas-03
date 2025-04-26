@@ -3,14 +3,17 @@ import msvcrt
 from functools import reduce
 import os
 import time
-from typing import Optional
+from typing import Any, Optional
 from colorama import Fore, Style
+
+from models.creditoSales import CreditSalesModel
+from services.CredtidoService import creditoDTO, creditoService
 from services.Customers.CustomersService import CrudCustomer
 from services.Products.ProductService import CrudProduct
 from services.Sales.salesDTO import Sale
-from models.company import Company
-from models.customer import GenericCustomer, RegularClient
-from models.product import Product
+from models.company import CompanyModel
+from models.customer import CustomerModel, RegularClient
+from models.product import ProductModel
 from helpers.utilities import clear_screen,blue_color, green_color, reset_color_code, purple_color
 from helpers.components import Menu,Valida
 from helpers.jsonManager import JsonFile
@@ -28,7 +31,8 @@ class CrudSales(ICrud):
     
         self.product_service:CrudProduct = CrudProduct()
         self.customer_service:CrudCustomer = CrudCustomer()
-        self.customer: GenericCustomer
+        self.credito_servicio:creditoService.CrudVentaCredito= creditoService.CrudVentaCredito()
+        self.customer: CustomerModel
 
     def create(self) ->None:
         # cabecera de la venta
@@ -37,7 +41,7 @@ class CrudSales(ICrud):
         set_color(Fore.GREEN + Style.NORMAL)
         gotoxy(2,1);print("*"*90)
         gotoxy(30,2);print("Registro de Venta")
-        gotoxy(17,3);print(Company.get_business_name)
+        gotoxy(17,3);print(CompanyModel.get_business_name)
         gotoxy(5,4);print(f"Factura#:F0999999 {' '*3} Fecha:{fecha_formateada}")
         gotoxy(66,4);print("Subtotal:")
         gotoxy(66,5);print("Decuento:")
@@ -74,7 +78,7 @@ class CrudSales(ICrud):
 
        
         # CONVER TOCUSTOMER GENERCI
-        self.customer:GenericCustomer = customer
+        self.customer:CustomerModel = customer
       
         gotoxy(23,6);print(Fore.WHITE + self.customer.dni + "  " + self.customer.fullName)
 
@@ -128,7 +132,7 @@ class CrudSales(ICrud):
                 continue
             else:    
                 prods = prods[0]
-                product = Product( id=  prods.id, product_name = prods.product_name , sale_price =  prods.sale_price , stock = prods.stock)
+                product = ProductModel( id=  prods.id, product_name = prods.product_name , sale_price =  prods.sale_price , stock = prods.stock)
                 # id
                 gotoxy(12,9+line);print("{:<5}".format(product.id))  
 
@@ -187,6 +191,25 @@ class CrudSales(ICrud):
             
             invoices.append(data)
             self.json_file.save(invoices)
+          
+            
+            credito:CreditSalesModel  = CreditSalesModel(num_factura=data["dni"] ,total_credito = data['total'],saldo_credito = data['total'], estado='Pendiente' )
+
+            cre = creditoDTO.Credito(credito)
+
+            dataCredi= cre.getJson()
+            
+            creditos = self.credito_servicio.json_file.read()
+
+            idVent = 1
+            if len(creditos) > 0 :
+                idVent=  creditos[-1]["id"]+1
+
+            dataCredi['id'] = idVent
+
+            creditos.append(dataCredi)
+            self.credito_servicio.json_file.save(creditos)
+     
             gotoxy(16,13+line);print( Fore.GREEN  + "😊 Venta Grabada satisfactoriamente"+reset_color_code)
         else:
             gotoxy(28,12+line);print("🤣 Venta Cancelada 🤣"+reset_color_code)    

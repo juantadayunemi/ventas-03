@@ -1,0 +1,10 @@
+[
+    {
+        "id": 1,
+        "num_factura ": "092656565215",
+        "total_credito ": 0.81,
+        "saldo_credito  ": 0.81,
+        "estado  ": "Pendiente",
+        "pagos": []
+    }
+]
