@@ -44,28 +44,6 @@
     ]
   },
   {
-    "id": 3,
-    "invoice_id": 6,
-    "date_credit": "2025-04-26",
-    "dni": "1798765234001",
-    "full_name": "VALERIA GONZALEZ ROMERO",
-    "total_credit": 39.49,
-    "credit_balance": 0.0,
-    "state": "Pagado",
-    "payments": [
-      {
-        "id": 3,
-        "date_pay": "2025-06-02",
-        "value_pay": 9.49
-      },
-      {
-        "id": 8,
-        "date_pay": "2025-04-02",
-        "value_pay": 30.0
-      }
-    ]
-  },
-  {
     "id": 4,
     "invoice_id": 7,
     "date_credit": "2025-04-26",

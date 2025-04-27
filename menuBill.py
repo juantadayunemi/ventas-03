@@ -4,6 +4,7 @@ from controllers.creditSalesController import CreditSalesController
 from controllers.customerController import CustomerController
 from controllers.productController import ProductController
 from controllers.salesController import SalesController
+from controllers.supplierController import SupplierController
 from helpers.components import Menu
 from databaseManagement.databaseManager import  DataService
 
@@ -122,7 +123,7 @@ if __name__ == "__main__":
             opc3 ='5'
             while opc3 !='5':
                 clear_screen()
-                suppCrud = CrudSales() # CrudSupplier()
+                suppCrud = SupplierController(data_service) 
                 set_color(Fore.BLUE + Style.BRIGHT)
                 menu_sales = Menu("Menu Proveedores",["1) Registro proveedor","2) Actualizar","3) Eliminar","4) Consultar","5) Salir"],20,2)
                 opc3 = menu_sales.printMenu()

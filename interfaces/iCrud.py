@@ -3,15 +3,15 @@ from abc import ABC, abstractmethod
 class ICrud(ABC):
  
     @abstractmethod    
-    def create(sef):
+    def create(self):
         pass
     @abstractmethod   
-    def update(sef):
+    def update(self):
         pass
     @abstractmethod 
-    def delete(sef):
+    def delete(self):
         pass
     @abstractmethod 
-    def consult(sef):
+    def consult(self):
         pass
     

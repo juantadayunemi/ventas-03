@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from doctest import REPORT_UDIFF
 import msvcrt 
 from functools import reduce
 from sys import exception
@@ -312,7 +313,65 @@ class CreditSalesController(ICrud):
 
 
     def delete(self) -> None:
-        ...
+            # Limpiar pantalla y mostrar encabezado
+            print('\033c', end='')
+            gotoxy(2,1);print(green_color+"█"*90)
+            gotoxy(2,2);print("██"+" "*34+"ELIMINAR COBROS"+" "*35+"██")
+
+            while True:
+                gotoxy(2,4); print("\33[0J")  # Limpiar desde cursor hasta fin de pantalla
+                gotoxy(2,4); invoice_num = input("Ingrese el número de cobro (o 'X' para salir): ").lower()
+
+                if invoice_num == "x":
+                    print("Operación cancelada por el usuario.")
+                    return
+                elif not invoice_num.isdigit():
+                    print(Fore.RED + "Error: El código debe ser numérico" + Fore.WHITE)
+                    time.sleep(1.5)
+                    continue
+
+                invoice_num = int(invoice_num)
+
+                # Buscar el crédito a eliminar
+                credit_remove = self.data_service.CreditSales.get(invoice_num)
+                            
+                # Validar existencia del crédito
+                if credit_remove is None:
+                    print(Fore.RED + "Error: No se encontró ningún cobro con ese número" + Fore.WHITE)
+                    time.sleep(1.5)
+                    continue
+                    
+                # Validar estado del crédito
+                if credit_remove.state == "Parcial":
+                    print(Fore.RED + "Error: Este crédito tiene abonos registrados y no puede eliminarse" + Fore.WHITE)
+                    time.sleep(1.5)
+                    continue
+
+                # Mostrar detalles del crédito
+                print("\n" + "=" * 50)
+                print(f"CRÉDITO N°: {credit_remove.id} - ESTADO: {credit_remove.state}".center(50))
+                print("=" * 50)
+                print(f"Fecha de emisión: {credit_remove.date_credit}")
+                print(f"Cliente: {credit_remove.dni} - {credit_remove.full_name}")
+                print("\n" + "-" * 50)
+                print(f"Total del crédito : ${credit_remove.total_credit:,.2f}".rjust(50))
+                print(f"Monto pagado      : ${round(credit_remove.total_credit - credit_remove.credit_balance, 2):,.2f}".rjust(50))
+                print(f"Saldo pendiente   : ${credit_remove.credit_balance:,.2f}".rjust(50))
+                print("=" * 50 + "\n")
+
+                # Confirmar eliminación
+                confirmation = input("¿Está seguro que desea eliminar este cobro? (S/N): ").lower()
+                if confirmation == "s":
+                    remove = self.data_service.CreditSales.remove(credit_remove.id)
+                    if remove: 
+                        print(Fore.GREEN + "Éxito: El cobro ha sido eliminado correctamente" + Fore.WHITE)
+                    else: 
+                        print(Fore.RED + "Error: No se pudo completar la eliminación" + Fore.WHITE)  
+                else:
+                    print("Operación cancelada por el usuario")      
+                    
+                time.sleep(2)
+                return
 
     def consult(self) ->None:
 
