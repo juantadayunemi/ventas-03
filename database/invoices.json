@@ -1,28 +1,400 @@
 [
   {
     "id": 1,
-    "date": "2025-04-25",
-    "dni": "0926565652",
-    "full_name": "Juan Perez",
+    "date_sales": "2025-04-26",
+    "dni": "0932145678",
+    "full_name": "JUAN MARTINEZ GONZALEZ",
     "payment_method": "Tarjeta",
-    "subtotal": 38.480000000000004,
+    "subtotal": 105.04,
     "discount": 0,
     "tax": 0,
-    "total": 38.480000000000004,
+    "total": 105.04,
     "details": [
       {
         "id": 1,
-        "product_name": "Product 1",
-        "sale_price": 10.99,
-        "quantity": 2,
-        "subtotal": 21.98
+        "product_id": 1,
+        "product_name": "SALSA TOMATE LOS ANDES 500 GR",
+        "sale_price": 1.25,
+        "quantity": 25,
+        "subtotal": 31.25
       },
       {
         "id": 2,
-        "product_name": "Product 2",
-        "sale_price": 5.5,
-        "quantity": 3,
-        "subtotal": 16.5
+        "product_id": 2,
+        "product_name": "ACEITE LA FAVORITA 500ML",
+        "sale_price": 2.36,
+        "quantity": 20,
+        "subtotal": 47.2
+      },
+      {
+        "id": 3,
+        "product_id": 3,
+        "product_name": "AVENA 1 KG",
+        "sale_price": 2.45,
+        "quantity": 2,
+        "subtotal": 4.9
+      },
+      {
+        "id": 4,
+        "product_id": 6,
+        "product_name": "COCA COLA 500ML",
+        "sale_price": 0.65,
+        "quantity": 25,
+        "subtotal": 16.25
+      },
+      {
+        "id": 5,
+        "product_id": 7,
+        "product_name": "PEPSI COLA 300ML",
+        "sale_price": 0.36,
+        "quantity": 2,
+        "subtotal": 0.72
+      },
+      {
+        "id": 6,
+        "product_id": 2,
+        "product_name": "ACEITE LA FAVORITA 500ML",
+        "sale_price": 2.36,
+        "quantity": 2,
+        "subtotal": 4.72
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "date_sales": "2025-04-26",
+    "dni": "1798765123001",
+    "full_name": "ANA GARCIA LOPEZ",
+    "payment_method": "Crédito",
+    "subtotal": 87.09,
+    "discount": 0,
+    "tax": 0,
+    "total": 87.09,
+    "details": [
+      {
+        "id": 1,
+        "product_id": 2,
+        "product_name": "ACEITE LA FAVORITA 500ML",
+        "sale_price": 2.36,
+        "quantity": 20,
+        "subtotal": 47.2
+      },
+      {
+        "id": 2,
+        "product_id": 2,
+        "product_name": "ACEITE LA FAVORITA 500ML",
+        "sale_price": 2.36,
+        "quantity": 10,
+        "subtotal": 23.6
+      },
+      {
+        "id": 3,
+        "product_id": 6,
+        "product_name": "COCA COLA 500ML",
+        "sale_price": 0.65,
+        "quantity": 4,
+        "subtotal": 2.6
+      },
+      {
+        "id": 4,
+        "product_id": 7,
+        "product_name": "PEPSI COLA 300ML",
+        "sale_price": 0.36,
+        "quantity": 4,
+        "subtotal": 1.44
+      },
+      {
+        "id": 5,
+        "product_id": 3,
+        "product_name": "AVENA 1 KG",
+        "sale_price": 2.45,
+        "quantity": 5,
+        "subtotal": 12.25
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "date_sales": "2025-04-26",
+    "dni": "1798765123001",
+    "full_name": "ANA GARCIA LOPEZ",
+    "payment_method": "Crédito",
+    "subtotal": 22.85,
+    "discount": 0,
+    "tax": 0,
+    "total": 22.85,
+    "details": [
+      {
+        "id": 1,
+        "product_id": 6,
+        "product_name": "COCA COLA 500ML",
+        "sale_price": 0.65,
+        "quantity": 20,
+        "subtotal": 13.0
+      },
+      {
+        "id": 2,
+        "product_id": 7,
+        "product_name": "PEPSI COLA 300ML",
+        "sale_price": 0.36,
+        "quantity": 10,
+        "subtotal": 3.6
+      },
+      {
+        "id": 3,
+        "product_id": 1,
+        "product_name": "SALSA TOMATE LOS ANDES 500 GR",
+        "sale_price": 1.25,
+        "quantity": 5,
+        "subtotal": 6.25
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "date_sales": "2025-04-26",
+    "dni": "1798765123001",
+    "full_name": "ANA GARCIA LOPEZ",
+    "payment_method": "Crédito",
+    "subtotal": 53.7,
+    "discount": 0,
+    "tax": 0,
+    "total": 53.7,
+    "details": [
+      {
+        "id": 1,
+        "product_id": 2,
+        "product_name": "ACEITE LA FAVORITA 500ML",
+        "sale_price": 2.36,
+        "quantity": 20,
+        "subtotal": 47.2
+      },
+      {
+        "id": 2,
+        "product_id": 6,
+        "product_name": "COCA COLA 500ML",
+        "sale_price": 0.65,
+        "quantity": 10,
+        "subtotal": 6.5
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "date_sales": "2025-04-26",
+    "dni": "1798765123001",
+    "full_name": "ANA GARCIA LOPEZ",
+    "payment_method": "Crédito",
+    "subtotal": 65.97,
+    "discount": 0,
+    "tax": 0,
+    "total": 65.97,
+    "details": [
+      {
+        "id": 1,
+        "product_id": 2,
+        "product_name": "ACEITE LA FAVORITA 500ML",
+        "sale_price": 2.36,
+        "quantity": 20,
+        "subtotal": 47.2
+      },
+      {
+        "id": 2,
+        "product_id": 6,
+        "product_name": "COCA COLA 500ML",
+        "sale_price": 0.65,
+        "quantity": 10,
+        "subtotal": 6.5
+      },
+      {
+        "id": 3,
+        "product_id": 2,
+        "product_name": "ACEITE LA FAVORITA 500ML",
+        "sale_price": 2.36,
+        "quantity": 2,
+        "subtotal": 4.72
+      },
+      {
+        "id": 4,
+        "product_id": 4,
+        "product_name": "AZUCAR SAN CARLOS 1KG",
+        "sale_price": 1.15,
+        "quantity": 6,
+        "subtotal": 6.9
+      },
+      {
+        "id": 5,
+        "product_id": 6,
+        "product_name": "COCA COLA 500ML",
+        "sale_price": 0.65,
+        "quantity": 1,
+        "subtotal": 0.65
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "date_sales": "2025-04-26",
+    "dni": "1798765234001",
+    "full_name": "VALERIA GONZALEZ ROMERO",
+    "payment_method": "Crédito",
+    "subtotal": 39.489999999999995,
+    "discount": 0,
+    "tax": 0,
+    "total": 39.489999999999995,
+    "details": [
+      {
+        "id": 1,
+        "product_id": 5,
+        "product_name": "LENTEJA POR LIBRA",
+        "sale_price": 0.96,
+        "quantity": 23,
+        "subtotal": 22.08
+      },
+      {
+        "id": 2,
+        "product_id": 6,
+        "product_name": "COCA COLA 500ML",
+        "sale_price": 0.65,
+        "quantity": 5,
+        "subtotal": 3.25
+      },
+      {
+        "id": 3,
+        "product_id": 2,
+        "product_name": "ACEITE LA FAVORITA 500ML",
+        "sale_price": 2.36,
+        "quantity": 6,
+        "subtotal": 14.16
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "date_sales": "2025-04-26",
+    "dni": "1798765876001",
+    "full_name": "LAURA SANCHEZ DIAZ",
+    "payment_method": "Crédito",
+    "subtotal": 34.9,
+    "discount": 0,
+    "tax": 0,
+    "total": 34.9,
+    "details": [
+      {
+        "id": 1,
+        "product_id": 5,
+        "product_name": "LENTEJA POR LIBRA",
+        "sale_price": 0.96,
+        "quantity": 20,
+        "subtotal": 19.2
+      },
+      {
+        "id": 2,
+        "product_id": 2,
+        "product_name": "ACEITE LA FAVORITA 500ML",
+        "sale_price": 2.36,
+        "quantity": 5,
+        "subtotal": 11.8
+      },
+      {
+        "id": 3,
+        "product_id": 6,
+        "product_name": "COCA COLA 500ML",
+        "sale_price": 0.65,
+        "quantity": 6,
+        "subtotal": 3.9
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "date_sales": "2025-04-26",
+    "dni": "0932145678",
+    "full_name": "JUAN MARTINEZ GONZALEZ",
+    "payment_method": "Tarjeta",
+    "discount_percentage": 0.1,
+    "subtotal": 29.71,
+    "discount": 2.97,
+    "tax": 4.01,
+    "total": 30.75,
+    "details": [
+      {
+        "id": 1,
+        "product_id": 1,
+        "product_name": "SALSA TOMATE LOS ANDES 500 GR",
+        "sale_price": 1.25,
+        "quantity": 10,
+        "subtotal": 12.5
+      },
+      {
+        "id": 2,
+        "product_id": 6,
+        "product_name": "COCA COLA 500ML",
+        "sale_price": 0.65,
+        "quantity": 5,
+        "subtotal": 3.25
+      },
+      {
+        "id": 3,
+        "product_id": 7,
+        "product_name": "PEPSI COLA 300ML",
+        "sale_price": 0.36,
+        "quantity": 6,
+        "subtotal": 2.16
+      },
+      {
+        "id": 4,
+        "product_id": 2,
+        "product_name": "ACEITE LA FAVORITA 500ML",
+        "sale_price": 2.36,
+        "quantity": 5,
+        "subtotal": 11.8
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "date_sales": "2025-04-26",
+    "dni": "1798765876001",
+    "full_name": "LAURA SANCHEZ DIAZ",
+    "payment_method": "Crédito",
+    "discount_percentage": 0.0,
+    "subtotal": 41.62,
+    "discount": 0.0,
+    "tax": 6.24,
+    "total": 47.86,
+    "details": [
+      {
+        "id": 1,
+        "product_id": 6,
+        "product_name": "COCA COLA 500ML",
+        "sale_price": 0.65,
+        "quantity": 5,
+        "subtotal": 3.25
+      },
+      {
+        "id": 2,
+        "product_id": 2,
+        "product_name": "ACEITE LA FAVORITA 500ML",
+        "sale_price": 2.36,
+        "quantity": 6,
+        "subtotal": 14.16
+      },
+      {
+        "id": 3,
+        "product_id": 7,
+        "product_name": "PEPSI COLA 300ML",
+        "sale_price": 0.36,
+        "quantity": 6,
+        "subtotal": 2.16
+      },
+      {
+        "id": 4,
+        "product_id": 3,
+        "product_name": "AVENA 1 KG",
+        "sale_price": 2.45,
+        "quantity": 9,
+        "subtotal": 22.05
       }
     ]
   }

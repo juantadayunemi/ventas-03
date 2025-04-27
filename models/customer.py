@@ -14,7 +14,7 @@ class ClientModel(ABC):
                 customer_type:Optional[int]=1,
                 ):
 
-        self.__id:int = -1 if not id else  id
+        self.__id:int = id if  id else -1
         self.__dni:str = dni 
         self.__first_name:str = first_name
         self.__last_name:str = last_name
@@ -36,10 +36,8 @@ class ClientModel(ABC):
     def dni(self, value) -> None:
         if not isinstance( value , str):
             raise ValueError('El numero de identificacion debe ser de tipo texto')
-        if len(value) in (10, 13):
-            self.__dni = value
-        else:
-            self.__dni ="9999999999999"  
+        self.__dni =value
+          
     
     @property
     def first_name(self)->str:
@@ -138,7 +136,7 @@ class CustomerModel(ClientModel, BaseModel):
         self.__discount =  discount if discount else 0
         self.__customer_type =  customer_type if  customer_type else 1
         self.__credit_limit =  credit_limit if  credit_limit else 0
-        self.instance:Union[RegularClient, VipClient, None] = None
+        self.__instance:Union[RegularClient, VipClient, None] = None
         super().__init__(first_name, last_name, dni=dni, id=id)  
 
         # Validation data
@@ -163,28 +161,28 @@ class CustomerModel(ClientModel, BaseModel):
         if  self.__instance:
             return self.__instance
         
-        if self.__type == 1:
+        if self.__customer_type == 1:
             self.__instance =  RegularClient(
                 first_name=self.first_name,
                 last_name=self.last_name,
-                dni=self.__dni
+                dni=self.dni
             )
         else : 
             self.__instance = VipClient(
             first_name=self.first_name,
             last_name=self.last_name,
-            dni=self.__dni
+            dni=self.dni
         )
         return  self.__instance
     
 
     @property
     def customer_type (self)-> int:
-        return self.__type
+        return self.__customer_type
     
     @customer_type.setter
     def customer_type (self, value)-> None:
-        self.__type = value
+        self.__customer_type = value
 
     @property
     def discount(self) -> float:
@@ -199,16 +197,17 @@ class CustomerModel(ClientModel, BaseModel):
         """Devuelve el límite de crédito del cliente."""
         customer_instance = self.__customer_instance()
         if isinstance(customer_instance, VipClient):
-            return customer_instance.__credit_limit
+            return customer_instance.credit_limit
         return 0
 
     def to_dict(self) -> dict[str, Any]:
+        """convierte en diccionario """
         return {
-            'id': self.__id,
-            'dni': self.__dni,
-            'first_name': self.__first_name,
-            'last_name': self.__last_name,
-            'customer_type': self.__customer_type,
+            'id': self.id,
+            'dni': self.dni,
+            'first_name': self.first_name.upper(),
+            'last_name': self.last_name.upper(),
+            'customer_type': self.customer_type,
             'discount': self.discount,
             'credit_limit': self.credit_limit,
         }

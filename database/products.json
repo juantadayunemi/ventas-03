@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "product_name": "SALSA TOMATE LOS ANDES 500 GR",
+    "description": "",
+    "purchase_price": 0,
+    "sale_price": 1.25,
+    "stock": "30"
+  },
+  {
+    "id": 2,
+    "product_name": "ACEITE LA FAVORITA 500ML",
+    "description": "",
+    "purchase_price": 0,
+    "sale_price": 2.36,
+    "stock": 20
+  },
+  {
+    "id": 3,
+    "product_name": "AVENA 1 KG",
+    "description": "",
+    "purchase_price": 0,
+    "sale_price": 2.45,
+    "stock": 20
+  },
+  {
+    "id": 4,
+    "product_name": "AZUCAR SAN CARLOS 1KG",
+    "description": "",
+    "purchase_price": 0,
+    "sale_price": 1.15,
+    "stock": 20
+  },
+  {
+    "id": 5,
+    "product_name": "LENTEJA POR LIBRA",
+    "description": "",
+    "purchase_price": 0,
+    "sale_price": 0.96,
+    "stock": 20
+  },
+  {
+    "id": 6,
+    "product_name": "COCA COLA 500ML",
+    "description": "",
+    "purchase_price": 0,
+    "sale_price": 0.65,
+    "stock": 63
+  },
+  {
+    "id": 7,
+    "product_name": "PEPSI COLA 300ML",
+    "description": "",
+    "purchase_price": 0,
+    "sale_price": 0.36,
+    "stock": 120
+  }
+]

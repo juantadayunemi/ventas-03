@@ -1,37 +1,33 @@
-import copy
+
 import msvcrt
 import os
 import time
 from typing import Any, Dict, List, Optional, Tuple
 from colorama import Fore, Style
 from components.header import Header_print
-from models import customer
-from services.Customers.CustomerDTO import CustomerDTO
-from models.company import CompanyModel
-from helpers.jsonManager import JsonFile
+
+
+from databaseManagement.databaseManager import DataService
 from helpers.utilities import clear_screen, get_last_color, gotoxy, set_color
 from interfaces.iCrud  import ICrud
 from helpers.components import Valida
 from env import  ROOT_PATH 
 from models.customer import  CustomerModel
 
-class CrudCustomer(ICrud):
+class CustomerController(ICrud):
 
-
-    def __init__(self):
-        self.__filename = os.path.join(ROOT_PATH, "files","customers.json")
-        self.json_file = JsonFile(self.__filename)
+    def __init__(self, data_service:DataService):
         self.validar:Valida = Valida() 
+        self.data_service = data_service
 
     def create(self) ->None:
 
-        # imprime cabecera de vrntas
+        # imprime cabecera de ventas
         start_x, start_y = Header_print("Agregando nuevo cliente..")
     
         flat:bool = True
         while flat: 
             
-          
             gotoxy(1,4)
             print("\033[0J", end="") 
 
@@ -79,46 +75,35 @@ class CrudCustomer(ICrud):
             first_name = self.validar.enter_data("Err:Ingresar apellido",25,9)
             last_name = self.validar.enter_data("Err:Ingresar nombre",60,9)
 
-            client = self.json_file.find("dni",dni)
+            isExistCustomer =   self.data_service.Customer.find("dni",dni)
 
             # ya existe un cliente con esta cedula
-            if (len(client)>0 ):
+            if (len(isExistCustomer)>0 ):
                 gotoxy(10,10); print(Fore.RED + "Ya está registrado un cliente con este dni")
                 response = input("Desea intentar con otro numero: s/n?")
                 if response.lower() !="s":
-                    flat = False
                     break
                 else:
                    continue
             newCustomer = CustomerModel(
                 dni=dni, first_name= first_name, 
-                last_name= last_name, customer_type = customer_type, id = 2)
+                last_name= last_name, customer_type = customer_type)
             
-            customerDTO = CustomerDTO(newCustomer)
-            customers = self.json_file.read()
 
-            ult_invoices = 1
-            if len(customers)>0:
-                 ult_invoices = customers[-1]["id"]+1
-
-            data:Dict[str, Any] = customerDTO.getJson()
-            data["id"]=ult_invoices
-            customers.append(data)
-                  
             # clean screen
             gotoxy(10,12); print("\033[0J", end="")
             message = "Esta todo listo!!\nDesea guardar esta información s/n? "
             save_respnse =   input(Fore.LIGHTMAGENTA_EX+ Style.BRIGHT + message)
             if (save_respnse.lower() == "s"):
-                self.json_file.save(customers)
-                flat = False
+
+                self.data_service.Customer.add(newCustomer)
                 gotoxy(10,14); print(Fore.LIGHTGREEN_EX +"Cliente guardado exitosamente..")
+                break
             else:
                 gotoxy(10,14); print(Fore.LIGHTGREEN_EX+"No guardaste!!.\nRegresamos al menu anterior")
-                flat = False
+                break
 
-            time.sleep(2)
-
+        time.sleep(2)
         set_color(current_style)
 
     def update(self) ->None:
@@ -126,12 +111,12 @@ class CrudCustomer(ICrud):
         # print header
         start_x, start_y  = Header_print("Actualización del Cliente")
         # Buscar cliente
-        client:CustomerModel | None = self.Select_customer(start_x, start_y)
+        customer_edit:CustomerModel | None = self.__select_customer(start_x, start_y)
        
-        if not client: 
+        if customer_edit is None: 
             return
        
-        self.__show_one_customer(5,6, client, "CLIENTE A MODIFICAR")
+        self.__show_one_customer(5,6, customer_edit, "CLIENTE A MODIFICAR")
        
         # Tabla de edición
         set_color(Fore.YELLOW + Style.BRIGHT)
@@ -152,11 +137,9 @@ class CrudCustomer(ICrud):
         # Tipo de cliente
         set_color(Fore.LIGHTBLUE_EX)
         gotoxy(5, 21); print("Tipo: (1) Personal , (2) Corporativo")
-        gotoxy(5, 22); print(f"Actual: {client.customer_type} ({'Personal' if client.customer_type == 1 else 'Corporativo'})")
+        gotoxy(5, 22); print(f"Actual: {customer_edit.customer_type} ({'Personal' if customer_edit.customer_type == 1 else 'Corporativo'})")
         
-        # Editar campos
-        custome_dto = CustomerDTO(client)
-        new_data = custome_dto.getJson() 
+        # Editar campos (convert to dictionary)
         for field in fields:
             gotoxy(field['x'], field['y'])
             set_color(Fore.WHITE + Style.BRIGHT)
@@ -165,8 +148,14 @@ class CrudCustomer(ICrud):
                                 col=field['x'],
                                 fil=field['y'])
                 
-                if new_value:  # Solo actualizar si hay valor
-                    new_data[field['name']] = new_value
+                if new_value:
+                    # usamos setattr para asignar dinamicamente
+                    if hasattr(customer_edit, field['name']):
+                        setattr(customer_edit, field['name'], new_value)
+                    else:
+                        raise AttributeError(f"El campo {field['name']} no existe en CustomerModel")
+
+
             except Exception as e:
                 self.__show_error(f"Error: {str(e)}", 5, 24)
                 return
@@ -181,7 +170,7 @@ class CrudCustomer(ICrud):
             gotoxy(22, 23)
             tipo = input()
             if tipo in ('1', '2'):
-                new_data['customer_type'] = int(tipo)
+                customer_edit.customer_type = int(tipo)
                 break
         
         # Confirmación
@@ -191,16 +180,59 @@ class CrudCustomer(ICrud):
         confirm =input().lower()
     
         if confirm.lower() == 's':
-            new_data["first_name"] = (new_data["first_name"]).upper()
-            new_data["last_name"] = (new_data["last_name"]).upper()
-            self.json_file.update(new_data)
+            self.data_service.Customer.update(customer_edit)
             gotoxy(5, 27); set_color(Fore.GREEN); print("! Cliente actualizado correctamente!")
         else:
             gotoxy(5, 27); set_color(Fore.YELLOW); print("⚠ Cambios descartados")
         
         time.sleep(2)
 
-    def Select_customer(self, x:int, y:int)-> CustomerModel | None:
+    def delete(self) ->None:
+        start_x, start_y = Header_print("Eliminando cliente")
+
+        customer_delete = self.__select_customer(start_x, start_y)
+ 
+        if customer_delete is None: 
+            return
+        # print the customer select
+        x, y = self.__show_one_customer(5,7, customer_delete, "CLIENTE A ELIMINAR")
+       
+        while True:
+            gotoxy(x,y+1); print("\033[0J", end="")
+            gotoxy(x+15,y+1)
+            response = input("Esta seguro de eliminar? s/n: ")
+            if not response.lower() in ("s","n"):
+                continue
+            if response.lower() == "n":
+                return
+            
+            # delete the customer 
+            row_affected = self.data_service.Customer.remove(customer_delete.id)
+            if (row_affected):
+                gotoxy(5,y+2)
+                print(Fore.RED + "Cliente eliminado")
+                time.sleep(1)
+            break
+
+    def consult(self) ->None:
+        
+        start_x, start_y = Header_print("LISTADO DE CLIENTES")
+        customers = self.data_service.Customer.get_all()
+ 
+        if not customers  or len(customers) == 0 : 
+            gotoxy(5,start_y+ 1); print(Fore.RED+ "No hay datos para mostrar..")
+            print(Fore.GREEN+ "Presione cualquier tecla para continuar...")
+            msvcrt.getch()  
+            return
+        # print the customer select
+       
+        table = self.__generate_client_table(customers,"")
+        x, y = self.__display_table_with_selection(table, 5, 5)
+        gotoxy(5,y+1)
+        print(Fore.GREEN+ "Presione cualquier tecla para continuar...")
+        msvcrt.getch()  
+
+    def __select_customer(self, x:int, y:int)-> CustomerModel | None:
           customer = None
           while not customer:
             set_color(Fore.LIGHTMAGENTA_EX)
@@ -210,8 +242,8 @@ class CrudCustomer(ICrud):
             if search.lower() == 'x':
                 return None
             
-            customer = self._find_client(search)
-            if not customer:
+            customer =  CustomerController.find_customer(self.data_service, search)
+            if customer is None:
               self.__show_error("❌ Cliente no encontrado!", 5, y+2)
               continue
 
@@ -224,43 +256,32 @@ class CrudCustomer(ICrud):
                     customer = [selected_client]  # Convertir a lista para consistencia
                 else:
                     return None  # Volver a buscar si canceló
-            
-            
-          
+
           return customer[0] if  customer else None
-    
-    def _find_client(self,search_term:str) ->List[Any]:
-        """Busca un cliente según el criterio de búsqueda"""
 
-        results: List[Dict[str, Any]] = []
+    @staticmethod
+    def find_customer(data_service: 'DataService', search_term: str) -> List[CustomerModel]:
+        """Busca clientes"""
+        if not search_term:
+            return data_service.Customer.get_all()
 
+        search_term = search_term.strip()
+        
+        # Búsqueda por DNI (exacta)
         if search_term.isdigit():
             if search_term.startswith("0"):
-                results =  self.json_file.find("dni", search_term)  # Búsqueda por cédula (Ecuador)
+                return data_service.Customer.find("dni", search_term) # DNI
             elif len(search_term) <= 3:
-                results =  self.json_file.find("id", int(search_term))   # Búsqueda por ID interno
+                customer = data_service.Customer.get(int(search_term)) # ID
+                return [customer] if customer else []
             else:
-                results  =  self.json_file.find("dni", search_term) # Búsqueda por cédula normal
-        elif len(search_term):
-            results =  self.json_file.search(["first_name", "last_name"], search_term) # x apellido y nombre
-        else:
-             results =  self.json_file.read()
-       
-        # convertir OBJETO
-        customers: List[CustomerModel] = []
-
-        for client_data in results:
-            customer = CustomerModel(
-                id = client_data.get('id', 1),
-                dni=client_data.get('dni', ''),
-                first_name=client_data.get('first_name', ''),
-                last_name=client_data.get('last_name', ''),
-                customer_type=client_data.get('customer_type', 1) ,
-                
-            )
-            customers.append(customer)
+                return data_service.Customer.find("dni", search_term)  # DNI
         
-        return customers
+        #  por nombre/apellido (parcial)
+        return data_service.Customer.search(
+            fields=["first_name", "last_name"],
+            search_term=search_term
+        )
 
     def __show_error(self,message:str, x:int, y:int):
         """Muestra un mensaje de error en posición fija"""
@@ -269,12 +290,12 @@ class CrudCustomer(ICrud):
         time.sleep(2)
    
    
-    def __generate_client_table(self, clients: list, title: str = "") -> str:
+    def __generate_client_table(self, customers: list[CustomerModel], title: str = "") -> str:
         """
-        Genera una tabla formateada de clientes en formato PrettyTable
+        Genera una tabla formateada de customers en formato PrettyTable
         
         Args:
-            clients: Lista de diccionarios con datos de clientes
+            clients: Lista de diccionarios con datos de customers
             title: Título opcional para la tabla
             
         Returns:
@@ -285,7 +306,7 @@ class CrudCustomer(ICrud):
         table = PrettyTable()
         table.field_names = ["ID", "DNI", "Apellidos", "Nombres", "Tipo"]
         table.align["ID"] = "l"
-        table.align["DNI"] = "r"
+        table.align["DNI"] = "l"
         table.align["Apellidos"] = "l"
         table.align["Nombres"] = "l"
         table.align["Tipo"] = "l"
@@ -293,13 +314,13 @@ class CrudCustomer(ICrud):
         if title:
             table.title = f" {title} "  # PrettyTable centra automáticamente los títulos
         
-        for client in clients:
+        for customer in customers:
             table.add_row([
-                client['id'],
-                client['dni'],
-                client['first_name'],
-                client['last_name'],
-                "Personal" if client['customer_type'] == 1 else "Corporativo"
+                customer.id,
+                customer.dni,
+                customer.first_name,
+                customer.last_name,
+                "Personal" if customer.customer_type== 1 else "Corporativo"
             ])
         
         return table.get_string()
@@ -326,7 +347,7 @@ class CrudCustomer(ICrud):
         # Posición para mensajes debajo de la tabla
         return (x, y + len(lines))
 
-    def __show_list(self, clients: list, x: int, y: int, title: str = "") -> CustomerModel | None:
+    def __show_list(self, clients: list[CustomerModel], x: int, y: int, title: str = "") -> CustomerModel | None:
         """
         Muestra lista de clientes en tabla y permite selección
         
@@ -356,7 +377,7 @@ class CrudCustomer(ICrud):
         
         # Buscar cliente seleccionado
         for client in clients:
-            if str(client['id']) == selected_id:
+            if str(client.id) == selected_id:
                 return client
         
         self.__show_error("ID no válido", x, y + 3)
@@ -379,47 +400,3 @@ class CrudCustomer(ICrud):
         return (x,y)
     
   
-    
-    def delete(self) ->None:
-        start_x, start_y = Header_print("Eliminando cliente")
-        customer_delete = self.Select_customer(start_x, start_y)
- 
-        if not customer_delete : 
-            return
-        # print the customer select
-        x, y = self.__show_one_customer(5,7, customer_delete, "CLIENTE A ELIMINAR")
-       
-        while True:
-            gotoxy(x,y+1); print("\033[0J", end="")
-            gotoxy(x+15,y+1)
-            response = input("Esta seguro de eliminar? s/n: ")
-            if not response.lower() in ("s","n"):
-                continue
-            if response.lower() == "n":
-                return
-            
-            # delete the customer 
-            row_affected = self.json_file.delete(customer_delete.id)
-            if (row_affected):
-                gotoxy(5,y+2)
-                print(Fore.RED + "Cliente eliminado")
-                time.sleep(1)
-            break
-
-    def consult(self) ->None:
-        
-        start_x, start_y = Header_print("LISTADO DE CLIENTES")
-        customers = self.json_file.read()
- 
-        if not customers  or len(customers) == 0 : 
-            gotoxy(5,start_y+ 1); print(Fore.RED+ "No hay datos para mostrar..")
-            print(Fore.GREEN+ "Presione cualquier tecla para continuar...")
-            msvcrt.getch()  
-            return
-        # print the customer select
-       
-        table = self.__generate_client_table(customers,"")
-        x, y = self.__display_table_with_selection(table, 5, 5)
-        gotoxy(5,y+1)
-        print(Fore.GREEN+ "Presione cualquier tecla para continuar...")
-        msvcrt.getch()  

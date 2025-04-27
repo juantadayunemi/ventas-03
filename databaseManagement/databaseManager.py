@@ -1,21 +1,25 @@
 from typing import TypeVar, Generic
-from dto.jsonReposit import JSONRepository
+from databaseManagement.jsonReposit import JSONRepository
 from env import ROOT_PATH
 from models.company import CompanyModel
+from models.creditPayment import CreditPaymentModel
 from models.creditoSales import CreditSalesModel
 from models.customer import CustomerModel
 from models.invoice import InvoiceModel
 from models.invoiceDetail import InvoiceDetailModel
+from models.product import ProductModel
 
 # Type variables for better type hints
 T = TypeVar('T')
 CreditSalesRepo = JSONRepository[CreditSalesModel]
+ProductRepo = JSONRepository[ProductModel]
 CompanyRepo = JSONRepository[CompanyModel]
 CustomerRepo = JSONRepository[CustomerModel]
 InvoiceRepo = JSONRepository[InvoiceModel]
 InvoiceDetailRepo = JSONRepository[InvoiceDetailModel]
+CreditPaymentRepo = JSONRepository[CreditPaymentModel]
 
-class db:
+class DataService :
     """Central database access point for all application entities"""
     
     def __init__(self) -> None:
@@ -23,37 +27,44 @@ class db:
         self.__creditSales = JSONRepository(
             entity_class=CreditSalesModel,
             custom_path=ROOT_PATH,
-            table_name='credit_sales',
-            single_file=True
+            table_name='credit_sales'
         )
         
         self.__company = JSONRepository(
             entity_class=CompanyModel,
             custom_path=ROOT_PATH,
-            table_name='companies',
-            single_file=True
+            table_name='companies'
         )
         
         self.__customer = JSONRepository(
             entity_class=CustomerModel,
             custom_path=ROOT_PATH,
-            table_name='customers',
-            single_file=True
+            table_name='customers'
         )
         
         self.__invoice = JSONRepository(
             entity_class=InvoiceModel,
             custom_path=ROOT_PATH,
-            table_name='invoices',
-            single_file=True
+            table_name='invoices'
         )
         
         self.__invoiceDetail = JSONRepository(
             entity_class=InvoiceDetailModel,
             custom_path=ROOT_PATH,
             table_name='invoice_details',  # Fixed typo in table name
-            single_file=False  # Details are stored within invoices
         )
+
+        self.__creditPaymentDetail = JSONRepository(
+                entity_class=CreditPaymentModel,
+                custom_path=ROOT_PATH,
+                table_name='payment_details'
+            )
+        
+        self.__product = JSONRepository(
+                entity_class=ProductModel,
+                custom_path=ROOT_PATH,
+                table_name='products'
+            )
 
     @property
     def CreditSales(self) -> CreditSalesRepo:
@@ -71,6 +82,11 @@ class db:
         return self.__customer
     
     @property
+    def Product(self) -> ProductRepo: 
+        """Access to payment detail repository"""
+        return self.__product
+    
+    @property
     def Invoice(self) -> InvoiceRepo:
         """Access to invoice repository"""
         return self.__invoice
@@ -80,6 +96,11 @@ class db:
         """Access to invoice detail repository"""
         return self.__invoiceDetail
 
+    @property
+    def CreditPaymentDetail(self) -> CreditPaymentRepo: 
+        """Access to payment detail repository"""
+        return self.__creditPaymentDetail
+    
     def initialize_database(self) -> None:
         """Initialize database structure if not exists"""
         # This ensures all directories are created
@@ -88,7 +109,10 @@ class db:
             self.__company,
             self.__customer,
             self.__invoice,
-            self.__invoiceDetail
+            self.__invoiceDetail,
+            self.__creditPaymentDetail,
+            self.__product,
+
         ]:
             # Accessing base_path triggers directory creation
             _ = repo.base_path

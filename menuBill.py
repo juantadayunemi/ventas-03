@@ -1,47 +1,25 @@
 from datetime import date
 from colorama import Fore, Style
+from controllers.creditSalesController import CreditSalesController
+from controllers.customerController import CustomerController
+from controllers.productController import ProductController
+from controllers.salesController import SalesController
 from helpers.components import Menu
+from databaseManagement.databaseManager import  DataService
 
-from models.invoice import InvoiceModel
-from services.CredtidoService.creditoService import CrudVentaCredito
-from services.Products.ProductService import CrudProduct
-from services.Sales.SalesService import CrudSales
-from services.Customers.CustomersService import CrudCustomer
-from helpers.utilities import clear_screen, set_color
+from helpers.utilities import clear_screen, gotoxy, set_color
 import time
-from dto.databaseManager  import db
-
+opc =""
 #Menu Proceso Principal
-opc:str = ''
 
 if __name__ == "__main__":
-    print('')
-    db = db()
- 
-    # Create new invoice with details
-    invoice = InvoiceModel(
-        dni="0926565652",
-        full_name="Juan Perez",
-        payment_method="Tarjeta"
-    )
-
-    # Add details (IDs will be auto-assigned)
-    invoice.details_collection.add("Product 1", 10.99, 2)
-    invoice.details_collection.add("Product 2", 5.50, 3)
-
-    # Save invoice (will auto-assign invoice ID and detail IDs)
-    saved_invoice = db.Invoice.add(invoice)
-
-
-    invoice.details_collection.remove(1)  # Elimina por ID.add()
-
-    print(invoice)
+    data_service   = DataService()  # Instancia de la base de datos
 
     _exit = "               <- Saliendo..."
-    while opc !='4':  
+    while opc !='6':  
         clear_screen()      
         # menu_main = Menu("SISTEMA DE FACTURACION",["1) Clientes","2) Productos","3) Ventas","4) Salir"],20,2)
-        menu_main = Menu("SISTEMA DE FACTURACION",["1) Clientes","2) Productos","3) Ventas","4) Proveedores", "5) credito", "6) Salir"],20,2)
+        menu_main = Menu("SISTEMA DE FACTURACION",["1) Clientes","2) Productos","3) Ventas","4) Proveedores", "5) Crédito", "6) Salir"],20,2)
         # cambio de color de letra y bold
         set_color(Fore.LIGHTBLUE_EX + Style.BRIGHT)
 
@@ -52,22 +30,29 @@ if __name__ == "__main__":
 
             opc1 = ''
             while opc1 !='5':
-                customers = CrudCustomer()
+                customer_controller = CustomerController(data_service)
                 clear_screen()  
+                gotoxy(20, 1)
+                print(Fore.BLUE + "╭───────╮")
+                gotoxy(20, 2)
+                print(Fore.BLUE + "│" + Fore.CYAN + "  👤  " + Fore.BLUE + "│  Menu Cientes")
+                gotoxy(20, 3)
+                print(Fore.BLUE + "╰───────╯" + Style.RESET_ALL)
+
                 set_color(Fore.BLUE + Style.BRIGHT)  
-                menu_clients = Menu("Menu Cientes",["1) Ingresar","2) Actualizar","3) Eliminar","4) Consultar","5) Salir"],20,2)
+                menu_clients = Menu("",["1) Ingresar","2) Actualizar","3) Eliminar","4) Consultar","5) Salir"],20,3)
                 opc1 = menu_clients.printMenu()
                 if opc1 == "1":  # ingresar
-                    customers.create()
+                    customer_controller.create()
 
                 elif opc1 == "2":  # Actualizar
-                    customers.update()
+                    customer_controller.update()
 
                 elif opc1 == "3":  # Eliminar
-                    customers.delete()
+                    customer_controller.delete()
 
                 elif opc1 == "4":  # Consultar
-                    customers.consult()
+                    customer_controller.consult()
 
                 elif opc1 == "5":  # Consultar
                    print(Fore.GREEN + _exit)
@@ -76,12 +61,17 @@ if __name__ == "__main__":
         elif opc == "2":
             opc2 = ''
             while opc2 !='5':
-                product = CrudProduct()
+                product = ProductController(data_service)
                 clear_screen() 
+                print(Fore.BLUE + """
+                    ╭─────────╮
+                    │ 🛒    │ Menu Productos
+                    ╰─────────╯
+                """ + Style.RESET_ALL)
                 set_color(Fore.BLUE + Style.BRIGHT)   
-                menu_products = Menu("🛍️  Menu Productos",["1) ⊕ Ingresar","2) ✎ Actualizar","3) ✕ Eliminar","4) ⌕ Consultar","5) ← Salir"],20,2)
+                menu_products = Menu("",["1) ⊕ Ingresar","2) ✎ Actualizar","3) ✕ Eliminar","4) ⌕ Consultar","5) ← Salir"],20,3)
                 opc2 = menu_products.printMenu()
-                if opc2 == "1": # Add 
+                if opc2 == "1": # Add 1
                     product.create()
                 
                 elif opc2 == "2": # update
@@ -100,9 +90,14 @@ if __name__ == "__main__":
             opc3 =''
             while opc3 !='5':
                 clear_screen()
-                sales = CrudSales()
+                print(Fore.BLUE + """
+                    ╭─────────╮
+                    │ 🧾    │  Menu Ventas
+                    ╰─────────╯
+                """ + Style.RESET_ALL)
+                sales = SalesController(data_service)
                 set_color(Fore.BLUE + Style.BRIGHT)
-                menu_sales = Menu("Menu Ventas",["1) Registro Venta","2) Actualizar","3) Eliminar","4) Consultar","5) Salir"],20,2)
+                menu_sales = Menu("",["1) Registro Venta","2) Actualizar","3) Eliminar","4) Consultar","5) Salir"],20,3)
                 opc3 = menu_sales.printMenu()
                 if opc3 == "1":  # registro de  venta
                     sales.create()
@@ -119,9 +114,12 @@ if __name__ == "__main__":
                 elif opc3 == "5":  # salir
                     print(Fore.GREEN + _exit)
                     time.sleep(1)  
-
+        # supplier
         elif opc == "4":
-            opc3 =''
+            clear_screen()
+            print('ups!!\2No disponible en esta version...')
+            time.sleep(2)
+            opc3 ='5'
             while opc3 !='5':
                 clear_screen()
                 suppCrud = CrudSales() # CrudSupplier()
@@ -144,29 +142,33 @@ if __name__ == "__main__":
                     print(Fore.GREEN + _exit)
                     time.sleep(1)  
 
-
-            clear_screen()
-      
+          
+        # cobro de deudas
         elif opc == "5":
             opc3 =''
             while opc3 !='5':
                 clear_screen()
-                suppCrud = CrudVentaCredito() 
+                print(Fore.BLUE + """
+                    ╭─────────╮
+                    │ 💰   │ Menu Cobros  
+                    ╰─────────╯
+                """ + Style.RESET_ALL)
+                credit_controller = CreditSalesController(data_service)
                 set_color(Fore.BLUE + Style.BRIGHT)
-                menu_sales = Menu("Menu ventas",["1) Registrar cobros","2) Actualizar","3) Eliminar","4) Consultar","5) Salir"],20,2)
+                menu_sales = Menu("",["1) Registrar cobros","2) Actualizar","3) Eliminar","4) Consultar","5) Salir"],20,3)
                 opc3 = menu_sales.printMenu()
                 if opc3 == "1":  # registro de  venta
           
-                    suppCrud.create()
+                    credit_controller.create()
                     
                 elif opc3 == "2": # actualizar
-                     suppCrud.update()
+                     credit_controller.update()
 
                 elif opc3 == "3": #  eliminar
-                    suppCrud.delete()
+                    credit_controller.delete()
 
                 elif opc3 == "4": # consultar    
-                    suppCrud.consult()
+                    credit_controller.consult()
 
                 elif opc3 == "5":  # salir
                     print(Fore.GREEN + _exit)

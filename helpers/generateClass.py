@@ -17,16 +17,16 @@ def generate_class(class_name: str, attributes: Dict[str, str]) -> str:
             # Atributo obligatorio
             required_attrs[attr] = attr_def
     
-    # Generar el método __init__
+    # generar el metodo __init__
     init_params = []
     init_body = []
     
-    # Parámetros obligatorios
+    # parm obligatorios
     for attr, attr_type in required_attrs.items():
         init_params.append(f"{attr}: {attr_type}")
         init_body.append(f"        self.__{attr}: {attr_type} = {attr}")
     
-    # Parámetros opcionales
+    # parm opcionales
     for attr, (attr_type, default_value) in optional_attrs.items():
         init_params.append(f"{attr}: {attr_type} = {default_value}")
         init_body.append(f"        self.__{attr}: {attr_type} = {attr}")

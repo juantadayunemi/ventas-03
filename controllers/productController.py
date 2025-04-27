@@ -1,32 +1,27 @@
 import msvcrt
 import os
 import time
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Tuple
 from colorama import Fore, Style
 from components.header import Header_print
-from services.Products.ProductDTO import ProductDTO
-from models.company import CompanyModel
+from databaseManagement.databaseManager import DataService
 from models.product import ProductModel
-from helpers.jsonManager import JsonFile
-from helpers.utilities import clear_screen, get_last_color, gotoxy, set_color
+from helpers.utilities import  get_last_color, gotoxy, set_color
 from interfaces.iCrud  import ICrud
 from helpers.components import Valida
 from env import ROOT_PATH 
 
-class CrudProduct(ICrud):
+class ProductController(ICrud):
     
-    def __init__(self):
-        self.__filename = os.path.join(ROOT_PATH, "files","products.json")
-        self.json_file = JsonFile(self.__filename)
+    def __init__(self, data_sevice:DataService) ->None:
         self.validar:Valida = Valida() 
+        self.data_service:DataService =data_sevice
     def create(self):
         # cabecera de la venta
         start_x, start_y = Header_print("Agregando nuevo producto..")
-    
-        flat:bool = True
-        while flat: 
+
+        while True: 
             
-          
             gotoxy(1,4)
             print("\033[0J", end="") 
 
@@ -45,31 +40,20 @@ class CrudProduct(ICrud):
 
           
             new_product = ProductModel(product_name=product_name, sale_price=sale_price, stock= int(stock))
-            
-            productDTO = ProductDTO(new_product)
-            products = self.json_file.read()
 
-            id = 1
-            if len(products)>0:
-                 id = products[-1]["id"]+1
-
-            data = productDTO.getJson()
-            data["id"]=id
-            products.append(data)
-                  
             # clean screen
             gotoxy(10,12); print("\033[0J", end="")
             set_color(Fore.LIGHTMAGENTA_EX+ Style.BRIGHT)
             save_respnse =   input("Esta todo listo!!\nDesea guardar esta información s/n?").lower()
             if (save_respnse == "s"):
-                self.json_file.save(products)
-                flat = False
+                self.data_service.Product.add(new_product)
                 gotoxy(10,14); print(Fore.RED +"Producto guardado exitosamente..")
+                break   
             else:
                 gotoxy(10,14); print(Fore.GREEN+"No guardaste!!.\nRegresamos al menu anterior")
-                flat = False
+                break
 
-            time.sleep(2)
+        time.sleep(2)
 
         set_color(current_style)
 
@@ -78,13 +62,13 @@ class CrudProduct(ICrud):
         current_style = get_last_color()
         start_x, start_y   = Header_print("Actualización del Producto")
         # Buscar product
-        product = self.Select_product(start_x, start_y)
+        product_edit = self.__select_product(start_x, start_y)
        
-        if not product: 
+        if product_edit is None: 
             set_color(current_style)
             return
        
-        self.__show_one_product(5,6, product, "PRODUCTO A MODIFICAR")
+        self.__show_one_product(5,6, product_edit, "PRODUCTO A MODIFICAR")
        
         # Tabla de edición
         set_color(Fore.YELLOW + Style.BRIGHT)
@@ -104,8 +88,6 @@ class CrudProduct(ICrud):
         
 
         # Editar campos
-        product_dt = ProductDTO(product)
-        new_data =   product_dt.getJson()
 
         for field in fields:
             gotoxy(field['x'], field['y'])
@@ -115,8 +97,13 @@ class CrudProduct(ICrud):
                                 col=field['x'],
                                 fil=field['y'])
                 
-                if new_value:  # Solo actualizar si hay valor
-                    new_data[field['name']] = new_value
+              
+                 # usamos setattr para asignar dinamicamente
+                if hasattr(product_edit, field['name']):
+                    setattr(product_edit, field['name'], new_value)
+                else:
+                    raise AttributeError(f"El campo {field['name']} no existe en ProductModel")
+
             except Exception as e:
                 self.__show_error(f"Error: {str(e)}", 5, 24)
                 return
@@ -128,15 +115,14 @@ class CrudProduct(ICrud):
         confirm =input(Fore.WHITE).lower()
     
         if confirm.lower() == 's':
-            new_data["product_name"] = (new_data["product_name"]).upper()
-            self.json_file.update(new_data)
+            self.data_service.Product.add(product_edit)
             gotoxy(5, 27); set_color(Fore.GREEN); print("! Producto actualizado correctamente!")
         else:
             gotoxy(5, 27); set_color(Fore.YELLOW); print("⚠ Cambios descartados")
             set_color(current_style)
         time.sleep(2)
 
-    def Select_product(self, x:int, y:int)-> ProductModel | None:
+    def __select_product(self, x:int, y:int)-> ProductModel | None:
           product = None
           while not product:
             set_color(Fore.LIGHTMAGENTA_EX)
@@ -149,8 +135,8 @@ class CrudProduct(ICrud):
             if search.lower() == 'x':
                 return None
             
-            product = self._find_product(search)
-            if not product:
+            product =  ProductController.find_product( self.data_service ,search)
+            if  product is None:
               self.__show_error(Fore.RED + "❌ Producto no encontrado!", 5, y+2)
               continue
 
@@ -168,36 +154,38 @@ class CrudProduct(ICrud):
           
           return product[0] if  product else None
     
-    def _find_product(self,search_term:str) -> List[ProductModel] | None:
-        """Busca un producto según el criterio de búsqueda"""
-        dict_data: list[dict[str, Any]] = []
 
+    @staticmethod
+    def find_product(data_service: 'DataService', search_term: str) -> list[ProductModel]:
+        """Busca productos según criterio de búsqueda (ID, nombre exacto o parcial)"""
+        if not search_term:
+            return data_service.Product.get_all()
+
+        search_term = search_term.strip().lower()
+        
+        # Búsqueda por ID (exacta)
         if search_term.isdigit():
-            if search_term.startswith("0"):
-                dict_data = self.json_file.find("product_name", search_term)  # ejme 0400 ml 
-            elif len(search_term) <= 3:
-                dict_data =  self.json_file.find("id", int(search_term))   # Búsqueda por ID interno
-            else:
-                dict_data =  self.json_file.find("product_name", search_term) # Búsqueda por nombre del producto
-        elif len(search_term) > 0:
-            dict_data =    self.json_file.search(["product_name"], search_term) # x nombre del producto
-        else:
-             dict_data =    self.json_file.read()
+            if len(search_term) <= 3:  # Búsqueda por ID numérico corto
+                product = data_service.Product.get(int(search_term))
+                return [product] if product else []
+            else:  # Números más largos (códigos de barras, etc.)
+                return data_service.Product.find("barcode", search_term) or \
+                    data_service.Product.find("id", int(search_term))
+        
+        # Búsqueda por nombre (parcial o exacto)
+        results = data_service.Product.search(
+            fields=["product_name", "description", "category"],  # Campos a buscar
+            search_term=search_term
+        )
+        
+        # Ordenar resultados por relevancia (nombres que empiezan con el término primero)
+        return sorted(results, 
+                    key=lambda p: (
+                        not p.product_name.lower().startswith(search_term),
+                        not search_term in p.product_name.lower(),
+                        p.product_name
+                    ))
 
-        products : list[ProductModel] = []
-        for item in dict_data:
-            product = ProductModel(
-                  product_name =item['product_name'],
-                  description = item['description'],
-                  purchase_price = item['purchase_price'],
-                  sale_price = item['sale_price'],
-                  stock = item['stock'],
-                  id = item['id']
-                 )
-
-            products.append(product)
-
-        return products
     
     def __show_error(self,message:str, x:int, y:int) ->None:
         """Muestra un mensaje de error en posición fija"""
@@ -318,8 +306,8 @@ class CrudProduct(ICrud):
     def delete(self) ->None:
 
         current_style = get_last_color()
-        start_x ,start_y= Header_print("Eliminando producto")
-        product_delete = self.Select_product(start_x, start_y)
+        x ,y = Header_print("Eliminando producto")
+        product_delete = self.__select_product(x, y)
  
         if not product_delete : 
             return
@@ -340,7 +328,7 @@ class CrudProduct(ICrud):
                 return
             
             # delete the customer 
-            row_affected =self.json_file.delete(product_delete.id)
+            row_affected =self.data_service.Product.remove(product_delete.id)
             gotoxy(5,y+3)
             if row_affected == 0:
                 print(Fore.RED + "No se eliminó")
@@ -358,7 +346,7 @@ class CrudProduct(ICrud):
 
         start_x, start_y = Header_print("LISTADO DE PRODUCTOS")
 
-        products:List[ProductModel] | None = self._find_product("")
+        products:list[ProductModel]  = self.data_service.Product.get_all()
  
         if not products  or len(products) == 0 : 
             gotoxy(5,start_y+ 1); print(Fore.RED+ "No hay datos para mostrar..")

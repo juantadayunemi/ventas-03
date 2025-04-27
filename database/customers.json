@@ -1,38 +1,92 @@
 [
-    {
-        "id": 1,
-        "dni": "0926565652",
-        "first_name": "CASTRO PAREDES",
-        "last_name": "CARLOS",
-        "customer_type": 1,
-        "discount": 0.0,
-        "credit_limit": 10000
-    },
-    {
-        "id": 3,
-        "dni": "092656565215",
-        "first_name": "MONTERO",
-        "last_name": "ANTONIO",
-        "customer_type": 2,
-        "discount": 0.0,
-        "credit_limit": 10000
-    },
-    {
-        "id": 4,
-        "dni": "06256565",
-        "first_name": "MONTERO",
-        "last_name": "CARLOS",
-        "customer_type": 2,
-        "discount": 0.0,
-        "credit_limit": 10000
-    },
-    {
-        "id": 5,
-        "dni": "06565625255",
-        "first_name": "GUEVARA",
-        "last_name": "JOSE",
-        "customer_type": 2,
-        "discount": 0.0,
-        "credit_limit": 10000
-    }
+  {
+    "id": 1,
+    "dni": "0987654321",
+    "last_name": "MONTENEGRO RIOS",
+    "first_name": "CARLOS",
+    "customer_type": 1,
+    "discount": 5,
+    "credit_limit": 0
+  },
+  {
+    "id": 2,
+    "dni": "1798765432001",
+    "last_name": "DELGADO VASQUEZ",
+    "first_name": "MARIA",
+    "customer_type": 2,
+    "discount": 10.5,
+    "credit_limit": 15000
+  },
+  {
+    "id": 3,
+    "dni": "0912345678",
+    "last_name": "PEREZ CASTILLO",
+    "first_name": "LUIS",
+    "customer_type": 1,
+    "discount": 0,
+    "credit_limit": 0
+  },
+  {
+    "id": 4,
+    "dni": "1798765123001",
+    "last_name": "GARCIA LOPEZ",
+    "first_name": "ANA",
+    "customer_type": 2,
+    "discount": 15.0,
+    "credit_limit": 20000
+  },
+  {
+    "id": 5,
+    "dni": "0976543210",
+    "last_name": "LOPEZ MARTINEZ",
+    "first_name": "PEDRO",
+    "customer_type": 1,
+    "discount": 2,
+    "credit_limit": 0
+  },
+  {
+    "id": 6,
+    "dni": "1798765098001",
+    "last_name": "RODRIGUEZ FERNANDEZ",
+    "first_name": "SOFIA",
+    "customer_type": 2,
+    "discount": 8.5,
+    "credit_limit": 12000
+  },
+  {
+    "id": 7,
+    "dni": "0932145678",
+    "last_name": "MARTINEZ GONZALEZ",
+    "first_name": "JUAN",
+    "customer_type": 1,
+    "discount": 0,
+    "credit_limit": 0
+  },
+  {
+    "id": 8,
+    "dni": "1798765876001",
+    "last_name": "SANCHEZ DIAZ",
+    "first_name": "LAURA",
+    "customer_type": 2,
+    "discount": 12.0,
+    "credit_limit": 18000
+  },
+  {
+    "id": 9,
+    "dni": "0965432187",
+    "last_name": "FERNANDEZ MORALES",
+    "first_name": "DIEGO",
+    "customer_type": 1,
+    "discount": 3,
+    "credit_limit": 0
+  },
+  {
+    "id": 10,
+    "dni": "1798765234001",
+    "last_name": "GONZALEZ ROMERO",
+    "first_name": "VALERIA",
+    "customer_type": 2,
+    "discount": 7.5,
+    "credit_limit": 9000
+  }
 ]

@@ -1,26 +1,96 @@
 [
   {
     "id": 1,
-    "num_factura": "26502",
-    "total_credito": 23.36,
-    "saldo_credito": 23.06,
-    "estado": "Pendiente",
-    "pagos": []
+    "invoice_id": 4,
+    "date_credit": "2025-04-26",
+    "dni": "1798765123001",
+    "full_name": "ANA GARCIA LOPEZ",
+    "total_credit": 53.7,
+    "credit_balance": 0.0,
+    "state": "Pagado",
+    "payments": [
+      {
+        "id": 4,
+        "date_pay": "2025-05-06",
+        "value_pay": 50.0
+      },
+      {
+        "id": 5,
+        "date_pay": "2025-02-06",
+        "value_pay": 3.7
+      }
+    ]
   },
   {
     "id": 2,
-    "num_factura": "333633",
-    "total_credito": 300.25,
-    "saldo_credito": 300.25,
-    "estado": "Pendiente",
-    "pagos": []
+    "invoice_id": 5,
+    "date_credit": "2025-04-28",
+    "dni": "1798765123001",
+    "full_name": "ANA GARCIA LOPEZ",
+    "total_credit": 65.97,
+    "credit_balance": 0.0,
+    "state": "Pagado",
+    "payments": [
+      {
+        "id": 1,
+        "date_pay": "2025-02-02",
+        "value_pay": 5.97
+      },
+      {
+        "id": 2,
+        "date_pay": "2025-03-02",
+        "value_pay": 60.0
+      }
+    ]
   },
   {
     "id": 3,
-    "num_factura": "333633",
-    "total_credito": 300.25,
-    "saldo_credito": 300.25,
-    "estado": "Pendiente",
-    "pagos": []
+    "invoice_id": 6,
+    "date_credit": "2025-04-26",
+    "dni": "1798765234001",
+    "full_name": "VALERIA GONZALEZ ROMERO",
+    "total_credit": 39.49,
+    "credit_balance": 0.0,
+    "state": "Pagado",
+    "payments": [
+      {
+        "id": 3,
+        "date_pay": "2025-06-02",
+        "value_pay": 9.49
+      },
+      {
+        "id": 8,
+        "date_pay": "2025-04-02",
+        "value_pay": 30.0
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "invoice_id": 7,
+    "date_credit": "2025-04-26",
+    "dni": "1798765876001",
+    "full_name": "LAURA SANCHEZ DIAZ",
+    "total_credit": 34.9,
+    "credit_balance": 34.9,
+    "state": "Pendiente",
+    "payments": []
+  },
+  {
+    "id": 5,
+    "invoice_id": 9,
+    "date_credit": "2025-04-26",
+    "dni": "1798765876001",
+    "full_name": "LAURA SANCHEZ DIAZ",
+    "total_credit": 47.86,
+    "credit_balance": 40.0,
+    "state": "Parcial",
+    "payments": [
+      {
+        "id": 9,
+        "date_pay": "2025-06-02",
+        "value_pay": 7.86
+      }
+    ]
   }
 ]

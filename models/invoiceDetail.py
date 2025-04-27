@@ -3,17 +3,19 @@ from typing import List, Dict, Any, Optional
 from models.base import BaseModel
 
 class InvoiceDetailModel(BaseModel):
-    _next_id = 1  # Variable de clase para autoincremento
+    _next_id = 1
     """Modelo para los items detallados de una factura"""
     def __init__(self, 
+                 product_id:int,
                  product_name: str, 
                  sale_price: float, 
                  quantity: int, 
                  id: Optional[int] = None):
         self.__id: int = id if id is not None else self._get_next_id()
+        self.__product_id: int = product_id
         self.__product_name: str = product_name
         self.__sale_price: float = sale_price
-        self.__quantity: int = quantity
+        self.__quantity: float = quantity
 
     # Propiedades
     @property
@@ -45,11 +47,11 @@ class InvoiceDetailModel(BaseModel):
         self.__sale_price = value
 
     @property
-    def quantity(self) -> int:
+    def quantity(self) -> float:
         return self.__quantity
 
     @quantity.setter
-    def quantity(self, value: int) -> None:
+    def quantity(self, value: float) -> None:
         if value < 1:
             raise ValueError("La cantidad debe ser al menos 1")
         self.__quantity = value
@@ -67,6 +69,7 @@ class InvoiceDetailModel(BaseModel):
     def to_dict(self) -> Dict[str, Any]:
         return {
             'id': self.__id,
+            'product_id': self.__product_id,
             'product_name': self.__product_name,
             'sale_price': self.__sale_price,
             'quantity': self.__quantity,
@@ -77,6 +80,7 @@ class InvoiceDetailModel(BaseModel):
     def from_dict(cls, data: Dict[str, Any]):
         return cls(
             id=data.get('id'),
+            product_id=data['product_id'],
             product_name=data['product_name'],
             sale_price=data['sale_price'],
             quantity=data['quantity']

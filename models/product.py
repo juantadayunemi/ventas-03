@@ -65,7 +65,7 @@ class ProductModel:
         """Convert the product to a dictionary for serialization"""
         return {
             'id': self.__id,
-            'product_name': self.__product_name,
+            'product_name': self.__product_name.upper(),
             'description': self.__description,
             'purchase_price': self.__purchase_price,
             'sale_price': self.__sale_price,

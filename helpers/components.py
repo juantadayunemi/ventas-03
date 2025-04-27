@@ -96,6 +96,7 @@ class Valida:
         
         return valor
 
+
     def validar_fecha(self, mensajeError: str, col: int, fil: int, isupdate=False):
         while True:
             gotoxy(col, fil)
@@ -105,53 +106,53 @@ class Valida:
             if isupdate and valor == "":
                 return valor
                 
-            # Verificar longitud (10 caracteres para dd/mm/yyyy)
-            if len(valor) != 10:
-                gotoxy(col, fil); print(Fore.RED + "Formato debe ser dd/mm/aaaa")
-                time.sleep(1)
-                gotoxy(col, fil); print(" " * 30)
+            # Basic format validation
+            if len(valor) != 10 or valor[2] != '/' or valor[5] != '/':
+                self._show_error(col, fil, "Use formato dd/mm/aaaa con /")
                 continue
                 
-            # Verificar que los separadores son /
-            if valor[2] != '/' or valor[5] != '/':
-                gotoxy(col, fil); print(Fore.RED + "Use formato dd/mm/aaaa con /")
-                time.sleep(1)
-                gotoxy(col, fil); print(" " * 30)
-                continue
-                
-            # Extraer día, mes y año
             partes = valor.split('/')
             if len(partes) != 3:
-                gotoxy(col, fil); print(Fore.RED + "Formato inválido")
-                time.sleep(1)
-                gotoxy(col, fil); print(" " * 30)
+                self._show_error(col, fil, "Formato inválido")
                 continue
                 
-            # Verificar que sean números
-            if not (partes[0].isdigit() and partes[1].isdigit() and partes[2].isdigit()):
-                gotoxy(col, fil); print(Fore.RED + "Solo números y / permitidos")
-                time.sleep(1)
-                gotoxy(col, fil); print(" " * 30)
+            # Numeric validation
+            if not all(p.isdigit() for p in partes):
+                self._show_error(col, fil, "Solo números y / permitidos")
                 continue
                 
-            # Convertir a enteros y validar rangos
+            # Convert and validate
             try:
-                dia = int(partes[0])
-                mes = int(partes[1])
-                ano = int(partes[2])
+                dia, mes, ano = map(int, partes)
                 
-                # Validaciones básicas de fecha
+                # Validate ranges
                 if mes < 1 or mes > 12:
                     raise ValueError("Mes inválido")
-                if dia < 1 or dia > 31:
-                    raise ValueError("Día inválido")
-                # Aquí podrías agregar más validaciones (días por mes, años bisiestos, etc.)
-                
+                    
+                # Validate days in month
+                if mes in [4, 6, 9, 11] and dia > 30:
+                    raise ValueError("Este mes solo tiene 30 días")
+                elif mes == 2:
+                    # Leap year check
+                    if (ano % 400 == 0) or (ano % 100 != 0 and ano % 4 == 0):
+                        max_days = 29
+                    else:
+                        max_days = 28
+                    if dia > max_days:
+                        raise ValueError(f"Febrero solo tiene {max_days} días este año")
+                elif dia > 31:
+                    raise ValueError("Día inválido para este mes")
+                    
                 return valor
             except ValueError as e:
-                gotoxy(col, fil); print(Fore.RED + f"Fecha inválida: {str(e)}")
-                time.sleep(1)
-                gotoxy(col, fil); print(" " * 40)
+                self._show_error(col, fil, f"Fecha inválida: {str(e)}")
+
+    def _show_error(self, col, fil, message):
+        gotoxy(col, fil); print(Fore.RED + message)
+        time.sleep(1)
+        gotoxy(col, fil); print(" " * len(message))
+
+
 
     def solo_letras(self,mensaje:str,mensajeError:str) ->str: 
         while True:

@@ -1,37 +1,33 @@
 import datetime
 import msvcrt 
 from functools import reduce
+from operator import inv
 import os
 import time
 from typing import Any, Optional
 from colorama import Fore, Style
 
+from controllers.customerController import CustomerController
+from controllers.productController import ProductController
+from databaseManagement.databaseManager import DataService
 from models.creditoSales import CreditSalesModel
-from services.CredtidoService import creditoDTO, creditoService
-from services.Customers.CustomersService import CrudCustomer
-from services.Products.ProductService import CrudProduct
-from services.Sales.salesDTO import Sale
+
 from models.company import CompanyModel
 from models.customer import CustomerModel, RegularClient
+from models.invoice import InvoiceModel
 from models.product import ProductModel
 from helpers.utilities import clear_screen,blue_color, green_color, reset_color_code, purple_color
 from helpers.components import Menu,Valida
-from helpers.jsonManager import JsonFile
 from helpers.utilities import gotoxy, set_color
 from interfaces.iCrud import ICrud
 from env import ROOT_PATH
 from prettytable import PrettyTable 
 
-class CrudSales(ICrud):
+class SalesController(ICrud):
 
-    def __init__(self):
-        self.__filename = os.path.join(ROOT_PATH, "files","invoices.json")
-        self.json_file = JsonFile(self.__filename)
+    def __init__(self, data_base: DataService):
+        self.data_base = data_base
         self.validar:Valida = Valida() 
-    
-        self.product_service:CrudProduct = CrudProduct()
-        self.customer_service:CrudCustomer = CrudCustomer()
-        self.credito_servicio:creditoService.CrudVentaCredito= creditoService.CrudVentaCredito()
         self.customer: CustomerModel
 
     def create(self) ->None:
@@ -41,11 +37,11 @@ class CrudSales(ICrud):
         set_color(Fore.GREEN + Style.NORMAL)
         gotoxy(2,1);print("*"*90)
         gotoxy(30,2);print("Registro de Venta")
-        gotoxy(17,3);print(CompanyModel.get_business_name)
+        gotoxy(17,3);print(CompanyModel.get_business_name())
         gotoxy(5,4);print(f"Factura#:F0999999 {' '*3} Fecha:{fecha_formateada}")
         gotoxy(66,4);print("Subtotal:")
         gotoxy(66,5);print("Decuento:")
-        gotoxy(66,6);print("Iva     :")
+        gotoxy(66,6);print("Iva(15%):")
         gotoxy(66,7);print("Total   :")
         gotoxy(15,6);print("Cedula:")
      
@@ -54,12 +50,12 @@ class CrudSales(ICrud):
         while not customer:
             print(Fore.WHITE)
             message = ""
-            dni=self.validar.enter_data("Err: Ingrese cliente",23,6)
-            if (dni.lower() == "x"):
+            search=self.validar.enter_data("Err: Ingrese cliente",23,6)
+            if (search.lower() == "x"):
                 return
             
             gotoxy(23,6); print(" "*42)
-            customer = self.customer_service._find_client(dni)
+            customer =  CustomerController.find_customer ( self.data_base, search)
             if not customer:
                 message = "Cliente no existe"
             elif (len (customer)> 1 ):
@@ -82,6 +78,7 @@ class CrudSales(ICrud):
       
         gotoxy(23,6);print(Fore.WHITE + self.customer.dni + "  " + self.customer.fullName)
 
+        payment_method = ""
         if (self.customer.customer_type == 1 ):
             while True:
                 gotoxy(5,7)
@@ -96,13 +93,22 @@ class CrudSales(ICrud):
                     self.customer.set_card(reponse == '2')
                     gotoxy(8,7);print(Fore.GREEN + Style.NORMAL + "Forma de pago:")
                     gotoxy(23,7);print(Fore.WHITE + f"Tarjeta {self.customer.discount *100}% descuento" if reponse == '2' else  Fore.WHITE + "Contado  (sin descuento)")
+                    payment_method = "Tarjeta" if reponse == '2' else "Contado"
                     break
+                else:
+                
+                    print( Fore.RED +"Seleccione uan de las opciones..")
+     
+                    time.sleep(1)
+                    gotoxy(1,8)
+                    print((len(message) + 10) * " ")
+                    continue
         else : 
+            payment_method = "Crédito"
             gotoxy(8,7);print(Fore.GREEN + Style.NORMAL + "Forma de pago:")
             gotoxy(23,7);print(Fore.WHITE + f"Crédito: (monto máximo $ {self.customer.credit_limit})")
              
 
-        sale = Sale(self.customer)
         # print header
         gotoxy(2,8);print(green_color+"_"*90 + reset_color_code) 
         gotoxy(5,9);print(purple_color+"Linea") 
@@ -115,13 +121,14 @@ class CrudSales(ICrud):
         # detalle de la venta
         follow ="s"
         line=1
+        invoice = InvoiceModel(self.customer.dni, self.customer.fullName, payment_method, discount_percentage= self.customer.discount )
         while follow.lower()=="s":
             gotoxy(7,9+line);print(line)
             gotoxy(15,9+line)
 
             search_product= self.validar.enter_data("Error: ingrese dato..",12,9+line)
           
-            prods =  self.product_service._find_product(search_product)
+            prods =  ProductController.find_product( self.data_base ,search_product)
             message = ""
             if not prods:
                 gotoxy(12,9+line);print(Fore.RED + "✗ No existe"); time.sleep(1); gotoxy(12,9+line);print(Fore.WHITE+"\033[0J")
@@ -147,11 +154,11 @@ class CrudSales(ICrud):
                 gotoxy(51,9+line);print("{:>8}".format(qyt))
 
                 gotoxy(61,9+line);print("{:>8}".format(f"{product.sale_price*qyt:.2f}"))
-                sale.add_detail(product,qyt)
-                gotoxy(76,4);print(round(sale.subtotal,2))
-                gotoxy(76,5);print(round(sale.discount,2))
-                gotoxy(76,6);print(round(sale.iva,2))
-                gotoxy(76,7);print(round(sale.total,2))
+                invoice.details_collection.add (product.id, product.product_name, product.sale_price ,qyt)
+                gotoxy(76,4);print(round(invoice.subtotal,2))
+                gotoxy(76,5);print(round(invoice.discount,2))
+                gotoxy(76,6);print(round(invoice.tax,2))
+                gotoxy(76,7);print(round(invoice.total,2))
                 gotoxy(74,9+line);follow=input() or "s"  
                 gotoxy(76,9+line);print(green_color+"✔"+ reset_color_code)  
                 line += 1
@@ -164,10 +171,10 @@ class CrudSales(ICrud):
             gotoxy(54,9+line+1);procesar = input().lower()
             if procesar not  in  ('s','n'):
                 continue
-            if procesar =="s" and sale.get_customer_type == 2 and sale.total >  sale.get_credit_limit:
+            if procesar =="s" and self.customer.customer_type == 2 and invoice.total > self.customer.credit_limit:
                 gotoxy(15,9+line + 3); 
                 gotoxy(15, 9 + line + 3)
-                print("El cliente VIP tiene un límite de ${:,.2f}.".format(sale.get_credit_limit))
+                print("El cliente VIP tiene un límite de ${:,.2f}.".format(self.customer.credit_limit))
 
                 gotoxy(15, 9 + line + 4)
                 print("No se puede guardar la venta.")
@@ -182,33 +189,20 @@ class CrudSales(ICrud):
         if procesar == "s":
             gotoxy(15,12+line);print( Fore.BLUE + "Procesando ...")
             time.sleep(1)
-            id = 1
-            invoices = self.json_file.read()
-            if len (invoices) >0:
-                id = invoices[-1]["id"]+1
-            data = sale.getJson()
-            data["id"]=id
-            
-            invoices.append(data)
-            self.json_file.save(invoices)
-          
-            
-            credito:CreditSalesModel  = CreditSalesModel(num_factura=data["dni"] ,total_credito = data['total'],saldo_credito = data['total'], estado='Pendiente' )
 
-            cre = creditoDTO.Credito(credito)
-
-            dataCredi= cre.getJson()
-            
-            creditos = self.credito_servicio.json_file.read()
-
-            idVent = 1
-            if len(creditos) > 0 :
-                idVent=  creditos[-1]["id"]+1
-
-            dataCredi['id'] = idVent
-
-            creditos.append(dataCredi)
-            self.credito_servicio.json_file.save(creditos)
+            invoice_backend= self.data_base.Invoice.add(invoice)
+            if invoice_backend is None:
+                print("ERROR: La factura no tiene ID asignado")
+                time.sleep(2)
+                return
+            if self.customer.customer_type == 2 : # Venta a credito por el tipo de cliente Vip
+                credit_sales = CreditSalesModel(invoice_id=invoice_backend.id, 
+                                                date_credit=invoice_backend.date_sales,
+                                                dni= self.customer.dni,
+                                                full_name=self.customer.fullName,
+                                                total_credit= invoice_backend.total)
+                
+                self.data_base.CreditSales.add(credit_sales)
      
             gotoxy(16,13+line);print( Fore.GREEN  + "😊 Venta Grabada satisfactoriamente"+reset_color_code)
         else:
@@ -241,25 +235,24 @@ class CrudSales(ICrud):
             if not invoice_num.isdigit() : 
                continue
             
-            invoice = self.json_file.find("id", int( invoice_num))
+            invoice = self.data_base.Invoice.get (invoice_num)
 
-            if len(invoice) == 0 :
+            if invoice is None :
                 print(Fore.RED + "No hay , intente con otro num.")
                 time.sleep(2)
                 continue
             else:
-                invoice = invoice[0]
                 break
 
         # print resum
         set_color(Fore.GREEN + Style.BRIGHT)
         print("\n" + "=" * 50)
-        print(f"FACTURA N°: {invoice['id']}".center(50))
+        print(f"FACTURA N°: {invoice.id}".center(50))
         print("=" * 50)
-        print(f"Fecha: {invoice['Fecha']}")
-        print(f"Cliente: {invoice["dni"]} {invoice['fullName']}")
-        print(f"Forma de pago: {invoice["pay"]}")
-        print(f"Total: {invoice["total"]}\n")
+        print(f"Fecha: {invoice.date_sales}")
+        print(f"Cliente: {invoice.dni} {invoice.full_name}")
+        print(f"Forma de pago: {invoice.payment_method}")
+        print(f"Total: {invoice.total}\n")
     
         #question 
         while True :
@@ -275,9 +268,9 @@ class CrudSales(ICrud):
                 return
             break
 
-        result  = self.json_file.delete(invoice["id"])
+        result  = self.data_base.Invoice.remove(invoice.id)
         gotoxy(5,16)
-        if result == 0:
+        if result == True:
             print(Fore.RED + "No se eliminó!!")
         else: 
             print(Fore.GREEN + "Proceso esxitoso!!")
@@ -292,20 +285,20 @@ class CrudSales(ICrud):
         if invoice_num.isdigit():
             invoice_num = int(invoice_num)
 
-            invoice = self.json_file.find("id",invoice_num)
+            invoice = self.data_base.Invoice.get(invoice_num)
                         
             # --- Imprimir cabecera de la factura ---
-            if len(invoice) == 0 :
+            if invoice is None:
                 print(Fore.RED + "No hay datos...")
                 time.sleep(1)
                 return
-            invoice  = invoice[0]
+
             print("\n" + "=" * 50)
-            print(f"FACTURA N°: {invoice['id']}".center(50))
+            print(f"FACTURA N°: {invoice.id}".center(50))
             print("=" * 50)
-            print(f"Fecha: {invoice['Fecha']}")
-            print(f"Cliente: {invoice["dni"]} {invoice['fullName']}")
-            print(f"Forma de pago: {invoice["pay"]}\n")
+            print(f"Fecha: {invoice.date_sales}")
+            print(f"Cliente: {invoice.dni} {invoice.full_name}")
+            print(f"Forma de pago: {invoice.payment_method}\n")
 
             # --- Tabla de productos (detalle) ---
             table = PrettyTable()
@@ -315,35 +308,34 @@ class CrudSales(ICrud):
             table.align["Cantidad"] = "r"
             table.align["Subtotal"] = "r"
 
-            for item in invoice['detail']:
-                subtotal = item['sale_price'] * item['quantity']
-                table.add_row([item['product_name'], f"${item['sale_price']:.2f}", item['quantity'], f"${subtotal:,.2f}"])
+            for item in invoice.details:
+                subtotal = item.sale_price* item.quantity
+                table.add_row([item.product_name, f"${item.sale_price:.2f}", item.quantity, f"${subtotal:,.2f}"])
 
             print(table)
 
             # --- Totales ---
             print("\n" + "-" * 50)
-            print(f"Subtotal: ${invoice['subtotal']:,.2f}".rjust(50))
-            print(f"Descuento: -${invoice['descuento']:,.2f}".rjust(50))
-            print(f"IVA (12%): ${invoice['iva']:,.2f}".rjust(50))
+            print(f"Subtotal: ${invoice.subtotal:,.2f}".rjust(50))
+            print(f"Descuento: -${invoice.discount:,.2f}".rjust(50))
+            print(f"IVA (12%): ${invoice.tax:,.2f}".rjust(50))
             print("=" * 50)
-            print(f"TOTAL: ${invoice['total']:,.2f}".rjust(50).upper())
+            print(f"TOTAL: ${invoice.total:,.2f}".rjust(50).upper())
             print("=" * 50)
 
         else:    
 
-            invoices = self.json_file.read()
+            invoices = self.data_base.Invoice.get_all()
             print("Consulta de Facturas")
             for fac in invoices:
                 print(
                     "{:<4} {:<12} {:<14} {:<25} {:>13,.2f}  {:<7}".format(
-                        fac['id'], fac['Fecha'],fac['dni'], fac['fullName'], fac['total'],fac['pay']
+                        fac.id, fac.date_sales,fac.dni, fac.full_name, fac.total,fac.payment_method
                     )
                 )
 
-            suma = reduce(lambda total, invoice: round(total+ invoice["total"],2),invoices,0)
-            totales_map = list(map(lambda invoice: invoice["total"], invoices))
-            total_client = list(filter(lambda invoice: invoice["fullName"] == "Dayanna Vera", invoices))
+            suma = reduce(lambda total, invoice: round(total+ invoice.total,2),invoices,0)
+            totales_map = list(map(lambda invoice: invoice.total, invoices))
 
             max_invoice = max(totales_map)
             min_invoice = min(totales_map)

@@ -1,5 +1,4 @@
 import os
-from typing import Literal, Union
 from colorama import Fore, Style, init
 
 # Variables globales: Colores en formato ANSI escape code
@@ -10,13 +9,6 @@ yellow_color = "\033[93m"
 blue_color = "\033[94m"
 purple_color = "\033[95m"
 cyan_color = "\033[96m"
-
-
-# Tipos posibles para los colores (basados en colorama)
-
-
-
-
 
 # Inicializar colorama (autoreset=False para mantener colores hasta cambio explícito)
 init(autoreset=False)
